@@ -19,10 +19,10 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 
 
 # Citation
-If you find our work useful in your research, please cite our paper [Transform2Act](https://samxuxiang.github.io/skexgen):
+If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
 @inproceedings{xxx,
-  title={Transform2Act: Learning a Transform-and-Control Policy for Efficient Agent Design},
+  title={SkexGen: Generating CAD Construction Sequences by Autoregressive VAE with Disentangled Codebooks},
   author={xxx},
   booktitle={xxx},
   year={xxx}
