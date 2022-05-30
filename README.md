@@ -6,19 +6,19 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 [website](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [video]()
 
 
-# Installation
+## Installation
 
 
-# Data Preprocess
+## Data Preprocess
 
 
-# Training
+## Training
 
 
-# Evaluation
+## Evaluation
 
 
-# Citation
+## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
 @inproceedings{xxx,
@@ -29,7 +29,7 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 }
 ```
 
-# License
+## License
 Please see the [license](LICENSE) for further details.
 
 ---
