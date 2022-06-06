@@ -53,18 +53,35 @@ Note this is only tested on CUDA 11.4 and up.
 * Train the sketch module (topology encoder, geometry encoder, sketch decoder)
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
-                      --output proj_log/your/sketch_exp \
+                      --output proj_log/your/exp \
                       --bit 6 --maxlen 250 --batchsize 256 --device '0' 
   ```
   `maxlen`: sketch sequence length.
 
 * Train the extrude module (extrude encoder, extrude decoder)
   ```
-    # python train_e.py --data path/to/cad_network/train_unique_e.pkl \
-                        --output proj_log/your/ext_exp \
-                        --bit 6 --maxlen 8 --batchsize 256 --device '0'
+    python train_e.py --data path/to/cad_network/train_unique_e.pkl \
+                      --output proj_log/your/exp \
+                      --bit 6 --maxlen 8 --batchsize 256 --device '0'
   ```
-  `maxlen`: number of extudes, extrude sequence length is maxlen x 20.
+  `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20.
+
+* Extract training dataset codes
+  ```
+    python extract_code.py --weight proj_log/your/exp \
+                           --epoch 300 --device 0 --maxlen 250 --bit 6 \
+                           --output proj_log/your/exp/codes \
+                           --data path/to/cad_network/train_unique_s.pkl \
+                           --invalid dpath/to/cad_network/train_invalid_s.pkl 
+  ```
+
+* Train the code module (code selector)
+  ```
+    python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
+                    --output proj_log/your/exp/codes/code_selector \
+                    --batchsize 512 --device '0' \
+                    --code 1000 --seqlen 10
+  ```
 
 
 ## Evaluation
