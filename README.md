@@ -28,21 +28,19 @@ Note this is only tested on CUDA 11.4 and up.
  
 ## Data
 * Download original DeepCAD json data from [here](https://github.com/ChrisWu1997/DeepCAD).
-* Go inside `occ_utils` folder.
-* Convert json to obj format and also save its stl
+* Convert json to obj format and also save its stl (under `occ_utils` folder):
   ```
     python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
   ```
-* Normalize CAD  
+* Normalize CAD (under `occ_utils` folder):  
   ```
     python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
   ```
-* Go inside `data_utils` folder.
-* Parse obj to network-friendly sequence and save as pickle
+* Parse obj to network-friendly sequence and save as pickle (under `data_utils` folder):
   ```
     python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
   ```
-* Remove duplicates 
+* Remove duplicates (under `data_utils` folder):
   ```
     python deduplicate.py --datapath path/to/cad_network --hash_type 's'
   ```
@@ -92,7 +90,7 @@ Train code Transformer:
 ## Testing and Evaluation
 
 
-Auto-regressively sample the codes and decode to sketch-and-extrude 
+Randomly sample the codes and decode to sketch-and-extrude: 
   ```
     python sample_ar.py --weight proj_log/your/exp \
                         --epoch 300 --device 0 --maxlen 250 --bit 6 \
