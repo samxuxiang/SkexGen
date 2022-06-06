@@ -104,14 +104,14 @@ Auto-regressively sample the codes and decode to sketch-and-extrude
 To evaluate the results by COV, MMD and JSD:
 ```bash
 # convert generated sketch-and-extrude to stl (under occ_utils folder)
-$ python visual_obj.py --data_folder proj_log/your/exp/samples
+  python visual_obj.py --data_folder proj_log/your/exp/samples
 
 # uniformly sample 2000 points on the CAD model (under occ_utils folder)
-$ python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
+  python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
 
 # evaluate generation performance (under eval folder)
-$  python eval_cad.py --fake proj_log/your/exp/samples \
-$                     --real path/to/cad_network/test_obj
+  python eval_cad.py --fake proj_log/your/exp/samples \
+                     --real path/to/cad_network/test_obj
 ```
 
 
