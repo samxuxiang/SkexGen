@@ -22,9 +22,9 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 3. Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 
 ### Docker:
-We also provide the docker image for SkexGen. You can download it from [here](https://hub.docker.com/repository/docker/samxuxiang/skexgen). 
- 
+We also provide the docker image for running SkexGen. You can find it on [dockerhub](https://hub.docker.com/repository/docker/samxuxiang/skexgen) (~10GB).
 
+ 
 ## Data Preprocess
 
 
