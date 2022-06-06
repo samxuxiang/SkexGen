@@ -11,7 +11,6 @@ import argparse
 from utils import find_files
 from pathlib import Path
 from OCC.Core.BRepCheck import BRepCheck_Analyzer
-from utils import write_stl_file
 from contextlib import contextmanager
 
 
@@ -144,15 +143,6 @@ class NormalizeSE:
             if not analyzer.IsValid():
                 raise Exception("brep check failed")
             
-            # Save stl 
-            # stl_name = Path(output_folder).stem + '_'+ str(extrude_idx).zfill(3) + "_extrude.stl"
-            # output_path =  os.path.join(output_folder, stl_name)
-            # write_stl_file(ext_solid, output_path, linear_deflection=0.001, angular_deflection=0.5)
-
-            # stl_name = Path(output_folder).stem + '_'+ str(extrude_idx).zfill(3) + "_post.stl"
-            # output_path =  os.path.join(output_folder, stl_name)
-            # write_stl_file(cur_solid, output_path, linear_deflection=0.001, angular_deflection=0.5)
-        
             extrude_idx += 1
 
             # Save obj
@@ -171,7 +161,7 @@ def run_parallel(project_folder):
     subfolder2 = project_folder.split('/')[-2]
     output_folder = os.path.join(args.out_folder, subfolder1, subfolder2)
 
-    extrude_param = find_files(os.path.join(args.data_folder, args.obj_folder, subfolder1, subfolder2), 'param.obj') 
+    extrude_param = find_files(os.path.join(args.data_folder, subfolder1, subfolder2), 'param.obj') 
     stl_files =  find_files(project_folder, 'extrude.stl') 
     converter = NormalizeSE(cube_size=5.0, norm_factor=0.98, extrude_size=1.0, sketch_size=1.0)  
     if len(stl_files) == 0:
@@ -193,12 +183,10 @@ def run_parallel(project_folder):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_folder", type=str, required=True)
-    parser.add_argument("--obj_folder", type=str, required=True)
-    parser.add_argument("--stl_folder", type=str, required=True)
     parser.add_argument("--out_folder", type=str, required=True)
     args = parser.parse_args()
 
-    data_folder = Path(os.path.join(args.data_folder, args.stl_folder))
+    data_folder = Path(args.data_folder)
     project_folders = []
     for idx in range(100): # all 100 folder
         cur_dir = data_folder / str(idx).zfill(4)
