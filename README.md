@@ -47,15 +47,17 @@ Note this is only tested on CUDA 11.4 and up.
   ```
     python deduplicate.py --datapath path/to/cad_network --hash_type 's'
   ```
-  hash_type: `s` for sketch training and `e` for extrude training.
+  hash_type: `s` for sketch data and `e` for extrude data.
 
 ## Training
-* Training sketch module (topology encoder, geometry encoder, sketch decoder)
-```
-  python train_s.py --data path/to/cad_network/train_unique_s.pkl \
-                    --output proj_log/your/exp \
-                    --bit 6 --maxlen 250 --batchsize 256 --device '0' 
-```
+* Train the sketch module (topology encoder, geometry encoder, sketch decoder)
+  ```
+    python train_s.py --data path/to/cad_network/train_unique_s.pkl \
+                      --output proj_log/your/exp \
+                      --bit 6 --maxlen 250 --batchsize 256 --device '0' 
+  ```
+  `maxlen`: token sequence length, set to 200 if you run out of memory.
+
 
 ## Evaluation
 
