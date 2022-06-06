@@ -22,8 +22,7 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 * Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 
 ### Docker
-We also provide the docker image for running SkexGen. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). 
-
+We also provide the docker image for running SkexGen. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). \
 Note this is only tested on CUDA 11.4 and up. 
 
  
@@ -105,4 +104,4 @@ Please see the [license](LICENSE) for further details.
 ---
 **Update (06/06/2022)**: Evaluation code added.\
 **Update (06/05/2022)**: Training code added.\
-**Update (05/30/2022)**: Code will be released soon!\
+**Update (05/30/2022)**: Code will be released soon!
