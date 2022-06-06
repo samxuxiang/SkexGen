@@ -13,7 +13,7 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 * Python >= 3.8
 * PyTorch >= 1.10.1
 
-### Dependencies:
+### Dependencies
 * Install [PyTorch 1.10.1](https://pytorch.org/get-started/previous-versions/) with the correct CUDA version.
 * Install other dependencies:
     ```
@@ -21,7 +21,7 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
     ```
 * Install pythonocc following the instruction [here](https://github.com/tpaviot/pythonocc-core).
 
-### Docker:
+### Docker
 We also provide the docker image for running SkexGen. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). 
 
 Note this is only tested on CUDA 11.4 and up. 
@@ -29,17 +29,33 @@ Note this is only tested on CUDA 11.4 and up.
  
 ## Data
 * Download original DeepCAD json data from [here](https://github.com/ChrisWu1997/DeepCAD).
+* Go inside `occ_utils` folder.
 * Convert json to obj format and also save its stl
   ```
-    python occ_utils/convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
+    python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
   ```
-* Normalize CAD 
+* Normalize CAD  
   ```
-    python occ_utils/normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
+    python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
   ```
+* Go inside `data_utils` folder.
+* Parse obj to network-friendly sequence and save as pickle
+  ```
+    python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
+  ```
+* Remove duplicates 
+  ```
+    python deduplicate.py --datapath path/to/cad_network --hash_type 's'
+  ```
+  hash_type: `s` for sketch training and `e` for extrude training.
 
 ## Training
-
+* Training sketch module (topology encoder, geometry encoder, sketch decoder)
+```
+  python train_s.py --data path/to/cad_network/train_unique_s.pkl \
+                    --output proj_log/your/exp \
+                    --bit 6 --maxlen 250 --batchsize 256 --device '0' 
+```
 
 ## Evaluation
 
