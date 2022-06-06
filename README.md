@@ -53,10 +53,18 @@ Note this is only tested on CUDA 11.4 and up.
 * Train the sketch module (topology encoder, geometry encoder, sketch decoder)
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
-                      --output proj_log/your/exp \
+                      --output proj_log/your/sketch_exp \
                       --bit 6 --maxlen 250 --batchsize 256 --device '0' 
   ```
-  `maxlen`: token sequence length, set to 200 if you run out of memory.
+  `maxlen`: sketch sequence length.
+
+* Train the extrude module (extrude encoder, extrude decoder)
+  ```
+    # python train_e.py --data path/to/cad_network/train_unique_e.pkl \
+                        --output proj_log/your/ext_exp \
+                        --bit 6 --maxlen 8 --batchsize 256 --device '0'
+  ```
+  `maxlen`: number of extudes, extrude sequence length is maxlen x 20.
 
 
 ## Evaluation
