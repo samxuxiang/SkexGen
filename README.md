@@ -86,8 +86,10 @@ Note this is only tested on CUDA 11.4 and up.
 
 
 
-## Evaluation
-* Auto-regressively sample the codes and decode to sketch-and-extrude 
+## Testing and Evaluation
+
+### Random Generation
+Auto-regressively sample the codes and decode to sketch-and-extrude 
   ```
     python sample_ar.py --weight proj_log/your/exp \
                         --epoch 300 --device 0 --maxlen 250 --bit 6 \
@@ -96,6 +98,7 @@ Note this is only tested on CUDA 11.4 and up.
                         --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
+To evaluate the results by COV, MMD and JSD:
 * Convert generated sketch-and-extrude to stl (under `occ_utils` folder)
   ```
     python visual_obj.py --data_folder proj_log/your/exp/samples
@@ -112,7 +115,7 @@ Note this is only tested on CUDA 11.4 and up.
                        --real path/to/cad_network/test_obj
   ```
 
-* Evaluate duplicate percentage (under `eval` folder)
+To evaluate the results by Unique and Novel percentage:
   ```
     python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
                             --gt_path path/to/cad_network/train_unique_s.pkl
