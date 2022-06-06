@@ -46,7 +46,7 @@ Note this is only tested on CUDA 11.4 and up.
   ```
     python deduplicate.py --datapath path/to/cad_network --hash_type 's'
   ```
-  hash_type: `s` for sketch data and `e` for extrude data.
+  hash_type: `s` for sketch data and `e` for extrude data
 
 ## Training
 * Train the sketch module (topology encoder, geometry encoder, sketch decoder)
@@ -55,7 +55,7 @@ Note this is only tested on CUDA 11.4 and up.
                       --output proj_log/your/exp \
                       --bit 6 --maxlen 250 --batchsize 256 --device '0' 
   ```
-  `maxlen`: sketch sequence length.
+  `maxlen`: sketch sequence length
 
 * Train the extrude module (extrude encoder, extrude decoder)
   ```
@@ -63,7 +63,7 @@ Note this is only tested on CUDA 11.4 and up.
                       --output proj_log/your/exp \
                       --bit 6 --maxlen 8 --batchsize 256 --device '0'
   ```
-  `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20.
+  `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
 
 * Extract training dataset codes
   ```
@@ -71,21 +71,52 @@ Note this is only tested on CUDA 11.4 and up.
                            --epoch 300 --device 0 --maxlen 250 --bit 6 \
                            --output proj_log/your/exp/codes \
                            --data path/to/cad_network/train_unique_s.pkl \
-                           --invalid dpath/to/cad_network/train_invalid_s.pkl 
+                           --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
 * Train the code module (code selector)
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
-                       --output proj_log/your/exp/codes/code_selector \
+                       --output proj_log/your/exp \
                        --batchsize 512 --device '0' \
                        --code 1000 --seqlen 10
   ```
+  `seqlen`: 4 topology codes, 2 geometry codes, 4 extrude codes 
+  `code`: max size of codebook is 1000
+
 
 
 ## Evaluation
+* Auto-regressively sample the codes and decode to sketch-and-extrude 
+  ```
+    python sample_ar.py --weight proj_log/your/exp \
+                        --epoch 300 --device 0 --maxlen 250 --bit 6 \
+                        --output proj_log/your/exp/samples \
+                        --data path/to/cad_network/train_unique_s.pkl \
+                        --invalid path/to/cad_network/train_invalid_s.pkl 
+  ```
 
+* Convert generated sketch-and-extrude to stl (under `occ_utils' folder):
+  ```
+    python visual_obj.py --data_folder proj_log/your/exp/samples
+  ```
 
+* Uniformly sample 2000 points on the CAD model (under `occ_utils' folder):
+  ```
+    python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd 
+  ```
+
+* Evaluate the generation performance (under `eval' folder):
+  ```
+    python eval_cad.py --fake proj_log/your/exp/samples \
+                       --real path/to/cad_network/test_obj
+  ```
+
+* Evaluate the duplicate percentage (under `eval' folder):
+  ```
+    python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
+                            --gt_path path/to/cad_network/train_unique_s.pkl
+  ```
 
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
