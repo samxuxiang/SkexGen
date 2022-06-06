@@ -27,6 +27,8 @@ Note this is only tested on CUDA 11.4 and up.
 
  
 ## Data
+
+### Preprocess
 Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD).
 
 Follow these steps to convert DeepCAD data to SkexGen format:
@@ -46,7 +48,13 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 # remove extrude training data duplicates (under `data_utils` folder)
   python deduplicate.py --datapath path/to/cad_network --hash_type 'e'
 ```
+### Pretrained Models
+SkexGen trained under different settings 
 
+| **Source Dataset** | **Input** | **Train** | **test** | **test**
+|--------------------|-----------|----------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| NYUv2              | RGBD      | raw sensor depth     | [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) | [saic_rawD.zip](http://aspis.cmpt.sfu.ca/projects/mirrors/mirror3d_zip_release/checkpoint/nyu/saic_rawD.zip)                  |
+| NYUv2              | RGBD      | refined sensor depth | [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) | [saic_refD.zip](http://aspis.cmpt.sfu.ca/projects/mirrors/mirror3d_zip_release/checkpoint/nyu/saic_refD.zip)                  |
 
 ## Training
 
