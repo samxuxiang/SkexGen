@@ -103,6 +103,6 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 Please see the [license](LICENSE) for further details.
 
 ---
-**Update (06/06/2022)**: Evaluation code added.
-**Update (06/05/2022)**: Training code added.
-**Update (05/30/2022)**: Code will be released soon!
+**Update (06/06/2022)**: Evaluation code added.\
+**Update (06/05/2022)**: Training code added.\
+**Update (05/30/2022)**: Code will be released soon!\
