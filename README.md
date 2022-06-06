@@ -96,23 +96,23 @@ Note this is only tested on CUDA 11.4 and up.
                         --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-* Convert generated sketch-and-extrude to stl (under `occ_utils' folder):
+* Convert generated sketch-and-extrude to stl (under `occ_utils` folder)
   ```
     python visual_obj.py --data_folder proj_log/your/exp/samples
   ```
 
-* Uniformly sample 2000 points on the CAD model (under `occ_utils' folder):
+* Uniformly sample 2000 points on the CAD model (under `occ_utils` folder):
   ```
     python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd 
   ```
 
-* Evaluate the generation performance (under `eval' folder):
+* Evaluate the generation performance (under `eval` folder)
   ```
     python eval_cad.py --fake proj_log/your/exp/samples \
                        --real path/to/cad_network/test_obj
   ```
 
-* Evaluate the duplicate percentage (under `eval' folder):
+* Evaluate the duplicate percentage (under `eval` folder)
   ```
     python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
                             --gt_path path/to/cad_network/train_unique_s.pkl
