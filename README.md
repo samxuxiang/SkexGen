@@ -49,7 +49,7 @@ Note this is only tested on CUDA 11.4 and up.
   hash_type: `s` for sketch data and `e` for extrude data
 
 ## Training
-* Train the sketch module (topology encoder, geometry encoder, sketch decoder)
+* Train sketch module (topology encoder, geometry encoder, sketch decoder)
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
                       --output proj_log/your/exp \
@@ -57,7 +57,7 @@ Note this is only tested on CUDA 11.4 and up.
   ```
   `maxlen`: sketch sequence length
 
-* Train the extrude module (extrude encoder, extrude decoder)
+* Train extrude module (extrude encoder, extrude decoder)
   ```
     python train_e.py --data path/to/cad_network/train_unique_e.pkl \
                       --output proj_log/your/exp \
@@ -74,7 +74,7 @@ Note this is only tested on CUDA 11.4 and up.
                            --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-* Train the code module (code selector)
+* Train code module (code selector)
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \
@@ -106,13 +106,13 @@ Note this is only tested on CUDA 11.4 and up.
     python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd 
   ```
 
-* Evaluate the generation performance (under `eval` folder)
+* Evaluate generation performance (under `eval` folder)
   ```
     python eval_cad.py --fake proj_log/your/exp/samples \
                        --real path/to/cad_network/test_obj
   ```
 
-* Evaluate the duplicate percentage (under `eval` folder)
+* Evaluate duplicate percentage (under `eval` folder)
   ```
     python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
                             --gt_path path/to/cad_network/train_unique_s.pkl
