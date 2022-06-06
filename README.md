@@ -68,7 +68,7 @@ To train the extrude module (extrude encoder, extrude decoder):
   `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
 
 ### Code Selector
-* Extract training dataset codes:
+Extract training dataset codes:
   ```
     python extract_code.py --weight proj_log/your/exp \
                            --epoch 300 --device 0 --maxlen 250 --bit 6 \
@@ -77,7 +77,7 @@ To train the extrude module (extrude encoder, extrude decoder):
                            --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-* Train code Transformer: 
+Train code Transformer: 
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \
