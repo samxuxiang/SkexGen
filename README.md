@@ -51,9 +51,9 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 ### Pretrained Models
 SkexGen trained under different settings 
 
-| **Sketch MaxLen** | **Extrude MaxLen** | **Topology Code** | **Geometry Code** | **Extrude Code** | **Download** 
+| **Sketch MaxLen** | **Extrude MaxLen** | **Code** | **Download** 
 |--------------------|-----------|----------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 250              | 8      | $4x500$     | $2x1000$ | $4x1000$  |  [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) |
+| 250              | 8      | $4x500$-$2x1000$-$4x1000$  |  [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) |
 
 
 ## Training
