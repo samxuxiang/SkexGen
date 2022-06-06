@@ -53,7 +53,12 @@ SkexGen trained under different settings
 
 | **Sketch MaxLen** | **Extrude MaxLen** | **Code Config (T-G-E)** | **Download** |
 |--------------------|-----------|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 200              | 8      | 4x500-2x1000-4x1000    | [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) | 
+| 200              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 200              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 200              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 250              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 250              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 250              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
 
 ## Training
 
