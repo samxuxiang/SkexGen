@@ -27,9 +27,9 @@ Note this is only tested on CUDA 11.4 and up.
 
  
 ## Data
-Download original DeepCAD json data from [here](https://github.com/ChrisWu1997/DeepCAD).
+Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD).
 
-Follow these steps to preprocess the data:
+Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
 # convert json to obj format and also save its stl (under `occ_utils` folder)
   python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
