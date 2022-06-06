@@ -27,24 +27,24 @@ Note this is only tested on CUDA 11.4 and up.
 
  
 ## Data
-* Download original DeepCAD json data from [here](https://github.com/ChrisWu1997/DeepCAD).
-* Convert json to obj format and also save its stl (under `occ_utils` folder):
-  ```
-    python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
-  ```
-* Normalize CAD (under `occ_utils` folder):  
-  ```
-    python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
-  ```
-* Parse obj to network-friendly sequence and save as pickle (under `data_utils` folder):
-  ```
-    python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
-  ```
-* Remove duplicates (under `data_utils` folder):
-  ```
-    python deduplicate.py --datapath path/to/cad_network --hash_type 's'
-  ```
-  hash_type: `s` for sketch data and `e` for extrude data
+Download original DeepCAD json data from [here](https://github.com/ChrisWu1997/DeepCAD).
+```bash
+# convert json to obj format and also save its stl (under `occ_utils` folder)
+  python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
+
+# normalize CAD (under `occ_utils` folder)
+  python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
+
+# parse obj to network-friendly sequence and save as pickle (under `data_utils` folder)
+  python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
+
+# remove sketch training data duplicates (under `data_utils` folder)
+  python deduplicate.py --datapath path/to/cad_network --hash_type 's'
+
+# remove extrude training data duplicates (under `data_utils` folder)
+  python deduplicate.py --datapath path/to/cad_network --hash_type 'e'
+```
+
 
 ## Training
 
@@ -88,8 +88,6 @@ Train code Transformer:
 
 
 ## Testing and Evaluation
-
-
 Randomly sample the codes and decode to sketch-and-extrude: 
   ```
     python sample_ar.py --weight proj_log/your/exp \
