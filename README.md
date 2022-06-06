@@ -49,7 +49,9 @@ Note this is only tested on CUDA 11.4 and up.
   hash_type: `s` for sketch data and `e` for extrude data
 
 ## Training
-* Train sketch module (topology encoder, geometry encoder, sketch decoder)
+
+### SkexGen Encoder - Decoder
+To train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
                       --output proj_log/your/exp \
@@ -57,7 +59,7 @@ Note this is only tested on CUDA 11.4 and up.
   ```
   `maxlen`: sketch sequence length
 
-* Train extrude module (extrude encoder, extrude decoder)
+To train the extrude module (extrude encoder, extrude decoder):
   ```
     python train_e.py --data path/to/cad_network/train_unique_e.pkl \
                       --output proj_log/your/exp \
@@ -65,7 +67,8 @@ Note this is only tested on CUDA 11.4 and up.
   ```
   `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
 
-* Extract training dataset codes
+### Code Selector
+* Extract training dataset codes:
   ```
     python extract_code.py --weight proj_log/your/exp \
                            --epoch 300 --device 0 --maxlen 250 --bit 6 \
@@ -74,7 +77,7 @@ Note this is only tested on CUDA 11.4 and up.
                            --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-* Train code module (code selector)
+* Train code Transformer: 
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \
@@ -88,7 +91,7 @@ Note this is only tested on CUDA 11.4 and up.
 
 ## Testing and Evaluation
 
-### Random Generation
+
 Auto-regressively sample the codes and decode to sketch-and-extrude 
   ```
     python sample_ar.py --weight proj_log/your/exp \
