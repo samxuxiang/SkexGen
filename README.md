@@ -51,10 +51,10 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 ### Pretrained Models
 SkexGen trained under different settings 
 
-| **Source Dataset** | **Input** | **Train** | **test** | **test**
+| **Sketch MaxLen** | **Extrude MaxLen** | **Topology Code** | **Geometry Code** | **Extrude Code** | **Download** 
 |--------------------|-----------|----------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| NYUv2              | RGBD      | raw sensor depth     | [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) | [saic_rawD.zip](http://aspis.cmpt.sfu.ca/projects/mirrors/mirror3d_zip_release/checkpoint/nyu/saic_rawD.zip)                  |
-| NYUv2              | RGBD      | refined sensor depth | [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) | [saic_refD.zip](http://aspis.cmpt.sfu.ca/projects/mirrors/mirror3d_zip_release/checkpoint/nyu/saic_refD.zip)                  |
+| 250              | 8      | $4x500$     | $2x1000$ | $4x1000$  |  [saic](https://github.com/saic-vul/saic_depth_completion/tree/94bececdf12bb9867ce52c970bb2d11dee948d37) |
+
 
 ## Training
 
