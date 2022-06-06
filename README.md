@@ -78,13 +78,14 @@ Note this is only tested on CUDA 11.4 and up.
 * Train the code module (code selector)
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
-                    --output proj_log/your/exp/codes/code_selector \
-                    --batchsize 512 --device '0' \
-                    --code 1000 --seqlen 10
+                       --output proj_log/your/exp/codes/code_selector \
+                       --batchsize 512 --device '0' \
+                       --code 1000 --seqlen 10
   ```
 
 
 ## Evaluation
+
 
 
 ## Citation
@@ -102,5 +103,6 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 Please see the [license](LICENSE) for further details.
 
 ---
-**Update (06/06/2022)**: Training and evaluation added.
+**Update (06/06/2022)**: Evaluation code added.
+**Update (06/05/2022)**: Training code added.
 **Update (05/30/2022)**: Code will be released soon!
