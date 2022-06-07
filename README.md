@@ -56,9 +56,9 @@ SkexGen trained under different settings
 | 200              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
 | 200              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
 | 200              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 250              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 250              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 250              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
+| 250              | 4       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1CdwRKaLILBKg9VfevsEaozjF2UtOA5PC?usp=sharing) | 
+| 250              | 8       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1bNl8OxkiFrCAez3yklxePPzT_BH4Akzb?usp=sharing) | 
+| 250              | 10      | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1Y5wrb7qKk1igJNpEUILES8MRdeS68kH5?usp=sharing) | 
 
 ## Training
 
