@@ -51,16 +51,55 @@ def convert_folder_parallel(data):
         return [fileName, str(ex)[:50]]
     return None
 
+def find_file_id(file_or_save_folder):
+    """
+    The json file will have a pathname of the form
+
+    /foo/bar/0040/00408502.json
+
+    The save folder will have a pathname of the form
+
+    /foo2/bar2/0040/00408502/
+
+    We want to find what DeepCAD call the file id.  In this 
+    example it's '0040/00408502'
+    """
+    parent = file_or_save_folder.parent
+    return f"{parent.stem}/{file_or_save_folder.stem}"
+
+
+def find_files_already_processed_in_sub_folder(sub_folder):
+    already_processed_ids = set()
+    for save_folder in sub_folder.glob("*"):
+        file_id = find_file_id(save_folder)
+        already_processed_ids.add(file_id)
+    return already_processed_ids
+
+
+def find_files_already_processed_in_output_folder(output_folder):
+    already_processed_ids = set()
+    for sub_folder in output_folder.glob("*"):
+        already_processed_ids = set.union(
+            already_processed_ids,
+            find_files_already_processed_in_sub_folder(sub_folder)
+        )
+    return already_processed_ids
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_folder", type=str, required=True, help="Path to the containing DeepCAD data")
     parser.add_argument("--output_folder", type=str, required=True, help="Path to write the output")
+    parser.add_argument("--verbose", action="store_true", help="Print extra information about convertion failures")
     args = parser.parse_args()
 
     output_folder = Path(args.output_folder)
     if not output_folder.exists():
         output_folder.mkdir()
+
+    # Find the list of files which were already 
+    # processed
+    already_processed_ids = find_files_already_processed_in_output_folder(output_folder)
     
     # Pre-load all json data
     deepcad_json = []
@@ -72,7 +111,11 @@ if __name__ == "__main__":
         cur_out = output_folder / str(i).zfill(4)
         if not cur_out.exists():
             cur_out.mkdir()
-        files = [ f for f in cur_in.glob("**/*.json")]
+        files = []
+        for f in cur_in.glob("**/*.json"):
+            file_id = find_file_id(f)
+            #if not file_id in already_processed_ids:
+            files.append(f)
         deepcad_json += files
         skexgen_obj += [cur_out]*len(files)
         
@@ -88,7 +131,8 @@ if __name__ == "__main__":
     convert_iter = Pool(threads).imap(convert_folder_parallel, iter_data) 
     for invalid in tqdm(convert_iter, total=len(deepcad_json)):
         if invalid is not None:
-            print(f'Error converting {invalid}...')
+            if args.verbose:
+                print(f'Error converting {invalid}...')
     
     
 
