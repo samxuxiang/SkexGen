@@ -184,6 +184,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_folder", type=str, required=True)
     parser.add_argument("--out_folder", type=str, required=True)
+    parser.add_argument("--verbose", action="store_true", help="Print extra information about convertion failures")
     args = parser.parse_args()
 
     data_folder = Path(args.data_folder)
@@ -197,7 +198,8 @@ if __name__ == "__main__":
     convert_iter = Pool(threads).imap(run_parallel, project_folders)
     for msg in tqdm(convert_iter, total=len(project_folders)):
         if len(msg)>0:
-            print(f'Normalization Error: {msg}')
+            if args.verbose:
+                print(f'Normalization Error: {msg}')
         
     
 
