@@ -48,6 +48,9 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 # remove extrude training data duplicates (under `data_utils` folder)
   python deduplicate.py --datapath path/to/cad_network --hash_type 'e'
 ```
+
+When running `convert.py` some files in the DeepCAD dataset fail to generate valid solid models.  You may use the the `--verbose` option to see additional details about the problem files.   If the `convert.py` script hangs during processing it can be safely restarted and will continue from where it left off.
+
 ### Pretrained Models
 SkexGen trained under different settings 
 
