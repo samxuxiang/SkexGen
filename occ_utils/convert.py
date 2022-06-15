@@ -114,8 +114,8 @@ if __name__ == "__main__":
         files = []
         for f in cur_in.glob("**/*.json"):
             file_id = find_file_id(f)
-            #if not file_id in already_processed_ids:
-            files.append(f)
+            if not file_id in already_processed_ids:
+                files.append(f)
         deepcad_json += files
         skexgen_obj += [cur_out]*len(files)
         
