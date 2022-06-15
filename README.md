@@ -40,7 +40,11 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
 
 # parse obj to network-friendly sequence and save as pickle (under `data_utils` folder)
-  python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
+  python parse.py \
+    --input path/to/cad_norm \
+    --train_val_test_split path/to/deepcad/train_val_test_split.json \
+    --output path/to/cad_network \
+    --bit 6
 
 # remove sketch training data duplicates (under `data_utils` folder)
   python deduplicate.py --datapath path/to/cad_network --hash_type 's'

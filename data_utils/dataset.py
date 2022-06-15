@@ -16,10 +16,10 @@ class SE():
         self.threads = threads
         self.bit = bit
 
-    def load_all_obj(self):
+    def load_all_obj(self, train_val_test_split):
         print("Loading obj data...")
 
-        with open('../data/train_val_test_split.json') as f:
+        with open(train_val_test_split) as f:
             data_split = json.load(f)
        
         project_folders = []
