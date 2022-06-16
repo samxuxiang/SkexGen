@@ -97,8 +97,9 @@ def parallel_hash_loops(loops, hash_type):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--datapath", type=str, required=True)
+    parser.add_argument("--data_folder", type=str, required=True)
     parser.add_argument("--hash_type", type=str, required=True)
+    parser.add_argument("--train_val_test_split", type=str, required=True, help="Path to the DeepCAD train_val_test_split.json file")
     args = parser.parse_args()
 
     # Load loops
@@ -129,7 +130,7 @@ if __name__ == "__main__":
     unique_percent = (unique_count / gen_len) * 100.0
     print(f"\tUnique Percentage: {unique_percent:.2f}%")
 
-    with open('../data/train_val_test_split.json') as f:  
+    with open(args.train_val_test_split) as f:  
         data_split = json.load(f)
 
     print('creating new data...')
@@ -147,11 +148,11 @@ if __name__ == "__main__":
         else:
             pass
 
-    with open(os.path.join(args.data_path,"train_unique_"+args.hash_type+".pkl"), "wb") as tf:
+    with open(os.path.join(args.data_folder,"train_unique_"+args.hash_type+".pkl"), "wb") as tf:
         pickle.dump(trainset, tf)
-    # with open(os.path.join(args.data_path,"test_unique_"+args.hash_type+".pkl"), "wb") as tf:
+    # with open(os.path.join(args.data_folder,"test_unique_"+args.hash_type+".pkl"), "wb") as tf:
     #     pickle.dump(testset, tf)
-    # with open(os.path.join(args.data_path,"val_unique_"+args.hash_type+".pkl"), "wb") as tf:
+    # with open(os.path.join(args.data_folder,"val_unique_"+args.hash_type+".pkl"), "wb") as tf:
     #     pickle.dump(valset, tf)
 
     print("Duplicate Stats:")
