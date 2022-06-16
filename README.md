@@ -47,10 +47,16 @@ Follow these steps to convert DeepCAD data to SkexGen format:
     --bit 6
 
 # remove sketch training data duplicates (under `data_utils` folder)
-  python deduplicate.py --datapath path/to/cad_network --hash_type 's'
+  python deduplicate.py \
+    --data_folder path/to/cad_network \
+    --train_val_test_split path/to/deepcad/train_val_test_split.json \
+    --hash_type 's' 
 
 # remove extrude training data duplicates (under `data_utils` folder)
-  python deduplicate.py --datapath path/to/cad_network --hash_type 'e'
+  python deduplicate.py \
+    --data_folder path/to/cad_network \
+    --train_val_test_split path/to/deepcad/train_val_test_split.json \
+    --hash_type 'e' 
 ```
 
 When running `convert.py` some files in the DeepCAD dataset fail to generate valid solid models.  You may use the the `--verbose` option to see additional details about the problem files.   If the `convert.py` script hangs during processing it can be safely restarted and will continue from where it left off.
@@ -142,7 +148,7 @@ To evaluate the results by Unique and Novel percentage:
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
 @inproceedings{xxx,
-  title={SkexGen: Generating CAD Construction Sequences by Autoregressive VAE with Disentangled Codebooks},
+  title={SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
   author={xxx},
   booktitle={xxx},
   year={xxx}
