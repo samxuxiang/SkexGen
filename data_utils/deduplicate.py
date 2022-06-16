@@ -104,11 +104,11 @@ if __name__ == "__main__":
 
     # Load loops
     print('loading data...')
-    with open(os.path.join(args.datapath, 'train.pkl'), 'rb') as f:
+    with open(os.path.join(args.data_folder, 'train.pkl'), 'rb') as f:
         loops = pickle.load(f)
-    # with open(os.path.join(args.data_path, 'test.pkl'), 'rb') as f:
+    # with open(os.path.join(args.data_folder, 'test.pkl'), 'rb') as f:
     #     loops += pickle.load(f)
-    # with open(os.path.join(args.data_path, 'val.pkl'), 'rb') as f:
+    # with open(os.path.join(args.data_folder, 'val.pkl'), 'rb') as f:
     #     loops += pickle.load(f)
 
     # Assign UID
