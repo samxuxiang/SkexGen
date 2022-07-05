@@ -95,7 +95,7 @@ To train the code selector:
 ## Testing and Evaluation
 Randomly sample the codes and decode to sketch-and-extrude: 
   ```
-    python sample_ar.py --weight proj_log/your/exp \
+    python sample.py --weight proj_log/your/exp \
                         --epoch 300 --device 0 --maxlen 250 --bit 6 \
                         --output proj_log/your/exp/samples \
                         --data path/to/cad_network/train_unique_s.pkl \
