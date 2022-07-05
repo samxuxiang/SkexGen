@@ -54,7 +54,6 @@ You can download the SkexGen pretrained model from [checkpoint]()
 
 ## Training
 
-### SkexGen Encoder - Decoder
 To train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
@@ -71,7 +70,7 @@ To train the extrude module (extrude encoder, extrude decoder):
   ```
   `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
 
-### Code Selector
+
 Extract training dataset codes:
   ```
     python extract_code.py --weight proj_log/your/exp \
@@ -81,9 +80,9 @@ Extract training dataset codes:
                            --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-Train code Transformer: 
+To train the code selector: 
   ```
-    python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
+    python train_code.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \
                        --batchsize 512 --device 0 \
                        --code 1000 --seqlen 10
@@ -103,7 +102,7 @@ Randomly sample the codes and decode to sketch-and-extrude:
                         --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-To evaluate the results by COV, MMD and JSD:
+Evaluate the results by COV, MMD and JSD:
 ```bash
 # convert generated sketch-and-extrude to stl (under occ_utils folder)
   python visual_obj.py --data_folder proj_log/your/exp/samples
