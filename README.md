@@ -49,6 +49,9 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 
 # remove duplicated extrude data
   python deduplicate.py --datapath ../data/cad_data --hash_type e
+
+# Find all the invalid CAD models
+  python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
 Download pre-processed SkexGen data from [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
