@@ -1,18 +1,16 @@
 import os
 import torch
 import argparse
-import pdb
 from multiprocessing import Pool
 from dataset import SketchExtData
 from model.ar import ARModel
 from model.decoder import SketchDecoder, EXTDecoder
 from model.encoder import PARAMEncoder, CMDEncoder, EXTEncoder
 from utils import CADparser, write_obj
-import pickle 
 
 
 
-def test(args):
+def sample(args):
     # Initialize gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
     device = torch.device("cuda:0")
@@ -78,7 +76,7 @@ def test(args):
         code_len = 4,
         num_code = 1000,
     )
-    ext_encoder.load_state_dict(torch.load('proj_log/6bit_4x1000_ip_nodrop_128codedim_maxlen4_flag/extenc_epoch_500.pt'))
+    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_200.pt')))
     ext_encoder = ext_encoder.to(device).eval()
 
     ext_decoder = EXTDecoder(
@@ -92,28 +90,28 @@ def test(args):
         max_len=dataset.maxlen_ext,
         quantization_bits=args.bit,
     )
-    ext_decoder.load_state_dict(torch.load('proj_log/6bit_4x1000_ip_nodrop_128codedim_maxlen4_flag/extdec_epoch_500.pt'))
+    ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_200.pt')))
     ext_decoder = ext_decoder.to(device).eval()
 
     ar_model = ARModel(
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 
-            'num_layers': 4,
+            'num_layers': 6,
             'num_heads': 8,
-            'dropout_rate': 0.1
+            'dropout_rate': 0.0
         },
         max_len=10,
         classes=1000,
     )
-    ar_model.load_state_dict(torch.load(os.path.join(args.weight, 'ucode_remove10_500', 'train_code_ar', 'ar_epoch_1000.pt')))
+    ar_model.load_state_dict(torch.load(os.path.join(args.output, 'ar_epoch_1000.pt')))
     ar_model = ar_model.to(device).eval()
 
     print('Random Generation...')
-    if not os.path.exists(args.output):
+    if not os.path.exists(args.output, 'samples'):
         os.makedirs(args.output)
     
-    NUM_SAMPLE = 10000
+    NUM_SAMPLE = 20000
     count = 0
     cad = []
     BS = 1024
@@ -127,14 +125,14 @@ def test(args):
         with torch.no_grad():
             codes = ar_model.sample(n_samples=BS)
             cmd_code = codes[:,:4] 
-            param_code = codes[:,4:6] ##
-            ext_code = codes[:,6:] ##
+            param_code = codes[:,4:6] 
+            ext_code = codes[:,6:] 
 
             cmd_codes = []
             param_codes = []
             ext_codes = []
             for cmd, param, ext in zip(cmd_code, param_code, ext_code):
-                if torch.max(cmd) >= 500 or torch.max(param) >= 1000 or torch.max(ext) >= 1000:
+                if torch.max(cmd) >= 500:
                     continue
                 else:
                     cmd_codes.append(cmd)
@@ -161,12 +159,10 @@ def test(args):
         
     # # Parallel raster OBJ
     gen_data = []
-    obj_data = []
 
     load_iter = Pool(36).imap(raster_cad, cad)
-    for data_sample, data_obj in load_iter:
+    for data_sample in load_iter:
         gen_data += data_sample
-        obj_data += data_obj
     print(len(gen_data))
 
     print('Saving...')
@@ -177,23 +173,21 @@ def test(args):
             os.makedirs(output)
         write_obj(output, value)
 
-    with open(os.path.join(args.output, 'objs.pkl'), "wb") as tf:
-        pickle.dump(obj_data, tf)
-
 
 def raster_cad(pixels):   
     try:
         parser = CADparser(args.bit)
-        parsed_data, saved_data = parser.perform(pixels)
-        return [parsed_data], [saved_data]
+        parsed_data = parser.perform(pixels)
+        return [parsed_data]
     except Exception as error_msg:  
-        return [], []
+        return []
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=str, required=True, help="Ouput folder containing the sampled results")
     parser.add_argument("--weight", type=str, required=True, help="Input folder containing the saved model")
+    parser.add_argument("--ext_weight", type=str, required=True, help="Input folder containing the saved model")
     parser.add_argument("--epoch", type=int, required=True, help="weight epoch")
     parser.add_argument("--device", type=int, help="CUDA Device Index")
     parser.add_argument("--maxlen", type=int, help="maximum token length")
@@ -201,6 +195,6 @@ if __name__ == "__main__":
     parser.add_argument("--invalid", type=str, required=True)
     parser.add_argument("--bit", type=int, help="quantization bit")
     args = parser.parse_args()
-
-    test(args)
+    
+    sample(args)
 

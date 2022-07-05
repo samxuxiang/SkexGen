@@ -27,7 +27,7 @@ def train(args):
             'embed_dim': 256, 
             'num_layers': 4,
             'num_heads': 8,
-            'dropout_rate': 0.1
+            'dropout_rate': 0.0
         },
         max_len=args.seqlen,
         classes=args.code,
@@ -45,7 +45,7 @@ def train(args):
     iters = 0
     print('Start training...')
 
-    for epoch in range(500):
+    for epoch in range(1000):
         print(epoch)
 
         for batch in dataloader:
@@ -74,7 +74,7 @@ def train(args):
 
         writer.flush()
         # save model after n epoch
-        if (epoch+1) % 100 == 0:
+        if (epoch+1) % 500 == 0:
             torch.save(model.state_dict(), os.path.join(args.output,'ar_epoch_'+str(epoch+1)+'.pt'))
 
     writer.close()

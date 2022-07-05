@@ -11,7 +11,7 @@ EXT_PAD = 1
 EXTRA_PAD = 1
 R_PAD = 2
 NUM_FLAG = 9 
-INITIAL_PASS = 30
+INITIAL_PASS = 25
 
 
 class PositionalEncoding(nn.Module):

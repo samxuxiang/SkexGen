@@ -66,7 +66,7 @@ def train(args):
     iters = 0
     print('Start training...')
 
-    for epoch in range(500):
+    for epoch in range(200):  # 200 epochs is enough
         with tqdm(dataloader, unit="batch") as batch_data:
             for ext_seq, flag_seq, ext_mask in batch_data:
                 ext_seq = ext_seq.to(device)
@@ -91,7 +91,7 @@ def train(args):
                     writer.add_scalar("Loss/extrude", ext_loss, iters)
                     writer.add_scalar("Loss/vq", vq_loss, iters)
 
-                if iters % 50 == 0 and selection is not None:
+                if iters % 25 == 0 and selection is not None:
                     writer.add_histogram('selection', selection, iters)
 
                 # Update AE model

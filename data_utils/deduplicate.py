@@ -105,11 +105,7 @@ if __name__ == "__main__":
     print('loading data...')
     with open(os.path.join(args.datapath, 'train.pkl'), 'rb') as f:
         loops = pickle.load(f)
-    # with open(os.path.join(args.data_path, 'test.pkl'), 'rb') as f:
-    #     loops += pickle.load(f)
-    # with open(os.path.join(args.data_path, 'val.pkl'), 'rb') as f:
-    #     loops += pickle.load(f)
-
+   
     # Assign UID
     for idx, data in enumerate(loops):
         data['uid'] = idx
@@ -149,10 +145,6 @@ if __name__ == "__main__":
 
     with open(os.path.join(args.data_path,"train_unique_"+args.hash_type+".pkl"), "wb") as tf:
         pickle.dump(trainset, tf)
-    # with open(os.path.join(args.data_path,"test_unique_"+args.hash_type+".pkl"), "wb") as tf:
-    #     pickle.dump(testset, tf)
-    # with open(os.path.join(args.data_path,"val_unique_"+args.hash_type+".pkl"), "wb") as tf:
-    #     pickle.dump(valset, tf)
 
     print("Duplicate Stats:")
     print(f"\tUnique Percentage: {unique_percent:.2f}%")

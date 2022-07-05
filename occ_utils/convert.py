@@ -84,7 +84,7 @@ if __name__ == "__main__":
         skexgen_obj,
     )
    
-    threads = 50  # number of threads in your computer
+    threads = 32  # number of threads in your computer
     convert_iter = Pool(threads).imap(convert_folder_parallel, iter_data) 
     for invalid in tqdm(convert_iter, total=len(deepcad_json)):
         if invalid is not None:

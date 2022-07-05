@@ -56,11 +56,11 @@ class SamplePoints:
         files = find_files(project_folder, 'final.stl')
         
         for filepath in files:
-            N_POINTS = 8096
+            N_POINTS = 2000
             try:
                 out_mesh = trimesh.load(str(filepath))
                 out_pc, _ = sample_surface(out_mesh, N_POINTS)
-                save_path = os.path.join(out_folder, ntpath.basename(filepath)[:-4]+'_8096pcd.ply')
+                save_path = os.path.join(out_folder, ntpath.basename(filepath)[:-4]+'_pcd.ply')
                 write_ply(out_pc, save_path)
 
             except Exception as ex:        

@@ -15,6 +15,7 @@ EXT_PAD = 1
 EXTRA_PAD = 1
 R_PAD = 2
 AUG_RANGE = 5
+MAX_EXT = 5
 
 
 class SketchData(torch.utils.data.Dataset):
@@ -48,7 +49,7 @@ class SketchData(torch.utils.data.Dataset):
             total_len = pix_len + EXTRA_PAD 
             uid = vec_data['name']
 
-            if total_len <= self.maxlen and num_se<=5: # and uid not in invaliduid:
+            if total_len <= self.maxlen and uid not in invaliduid:
                 self.data[uid] = vec_data
                 if pix_len+EXTRA_PAD > self.maxlen_pix:
                     self.maxlen_pix = pix_len+EXTRA_PAD
@@ -181,7 +182,7 @@ class SketchExtData(torch.utils.data.Dataset):
             uid = vec_data['name']
             ext_len = vec_data['len_ext']
            
-            if total_len <= self.maxlen and vec_data['num_se']<=4: # and uid not in invaliduid:
+            if total_len <= self.maxlen and vec_data['num_se']<=MAX_EXT and uid not in invaliduid:
                 self.data[uid] = vec_data
                 ext_len = vec_data['len_ext']
                 if pix_len+EXTRA_PAD > self.maxlen_pix:

@@ -29,7 +29,7 @@ Note this is only tested on CUDA 11.4 and up.
 ## Data
 
 ### Preprocess
-Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD).
+Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD) and put it under `data` folder.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
@@ -43,22 +43,19 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
 
 # remove sketch training data duplicates (under `data_utils` folder)
-  python deduplicate.py --datapath path/to/cad_network --hash_type 's'
+  python deduplicate.py --datapath path/to/cad_network --hash_type s
 
 # remove extrude training data duplicates (under `data_utils` folder)
-  python deduplicate.py --datapath path/to/cad_network --hash_type 'e'
+  python deduplicate.py --datapath path/to/cad_network --hash_type e
 ```
 ### Pretrained Models
 SkexGen trained under different settings 
 
-| **Sketch MaxLen** | **Extrude MaxLen** | **Code Config (T-G-E)** | **Download** |
-|--------------------|-----------|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 200              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 200              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 200              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 250              | 4       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1CdwRKaLILBKg9VfevsEaozjF2UtOA5PC?usp=sharing) | 
-| 250              | 8       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1bNl8OxkiFrCAez3yklxePPzT_BH4Akzb?usp=sharing) | 
-| 250              | 10      | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1Y5wrb7qKk1igJNpEUILES8MRdeS68kH5?usp=sharing) | 
+| **Sketch MaxLen** | **Extrude MaxLen** | **Download** |
+|--------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| 200              | 3       | [checkpoint]() | 
+| 200              | 4       | [checkpoint]() | 
+| 200              | 5       | [checkpoint]() | 
 
 ## Training
 
@@ -67,7 +64,7 @@ To train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
                       --output proj_log/your/exp \
-                      --bit 6 --maxlen 250 --batchsize 256 --device '0' 
+                      --bit 6 --maxlen 200 --batchsize 128 --device 0
   ```
   `maxlen`: sketch sequence length
 
@@ -75,7 +72,7 @@ To train the extrude module (extrude encoder, extrude decoder):
   ```
     python train_e.py --data path/to/cad_network/train_unique_e.pkl \
                       --output proj_log/your/exp \
-                      --bit 6 --maxlen 8 --batchsize 256 --device '0'
+                      --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
   `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
 
@@ -83,7 +80,7 @@ To train the extrude module (extrude encoder, extrude decoder):
 Extract training dataset codes:
   ```
     python extract_code.py --weight proj_log/your/exp \
-                           --epoch 300 --device 0 --maxlen 250 --bit 6 \
+                           --epoch 300 --device 0 --maxlen 200 --bit 6 \
                            --output proj_log/your/exp/codes \
                            --data path/to/cad_network/train_unique_s.pkl \
                            --invalid path/to/cad_network/train_invalid_s.pkl 
@@ -93,7 +90,7 @@ Train code Transformer:
   ```
     python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \
-                       --batchsize 512 --device '0' \
+                       --batchsize 512 --device 0 \
                        --code 1000 --seqlen 10
   ```
   `seqlen`: 4 topology codes, 2 geometry codes, 4 extrude codes 
@@ -119,17 +116,11 @@ To evaluate the results by COV, MMD and JSD:
 # uniformly sample 2000 points on the CAD model (under occ_utils folder)
   python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
 
-# evaluate generation performance (under eval folder)
+# evaluate generation performance (under home folder)
   python eval_cad.py --fake proj_log/your/exp/samples \
                      --real path/to/cad_network/test_obj
 ```
 
-
-To evaluate the results by Unique and Novel percentage:
-  ```
-    python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
-                            --gt_path path/to/cad_network/train_unique_s.pkl
-  ```
 
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
@@ -146,6 +137,7 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 Please see the [license](LICENSE) for further details.
 
 ---
+**Update (07/05/2022)**: Full code released.\
 **Update (06/06/2022)**: Evaluation code added.\
 **Update (06/05/2022)**: Training code added.\
 **Update (05/30/2022)**: Code will be released soon!

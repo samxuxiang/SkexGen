@@ -68,7 +68,7 @@ def train(args):
    
     # Initialize optimizer
     params = list(sketch_decoder.parameters()) + list(param_encoder.parameters()) + list(cmd_encoder.parameters()) 
-    optimizer = torch.optim.AdamW(params, lr=1e-3)
+    optimizer = torch.optim.Adam(params, lr=1e-3)
     scheduler = get_constant_schedule_with_warmup(optimizer, 2000)
    
     # logging 
@@ -78,7 +78,7 @@ def train(args):
     iters = 0
     print('Start training...')
 
-    for epoch in range(500):
+    for epoch in range(300):  # 300 epochs is usually enough
         print(f'Epoch {epoch}')
         with tqdm(dataloader, unit="batch") as batch_data:
             for cmd, cmd_mask, pix, xy, mask, pix_aug, xy_aug, mask_aug in batch_data:
@@ -113,7 +113,7 @@ def train(args):
                     writer.add_scalar("Loss/param_vq", pvq_loss, iters)
                     writer.add_scalar("Loss/cmd_vq", cvq_loss, iters)
 
-                if iters % 50 == 0 and c_selection is not None and p_selection is not None:
+                if iters % 25 == 0 and c_selection is not None and p_selection is not None:
                     writer.add_histogram('cmd_selection', c_selection, iters)
                     writer.add_histogram('param_selection', p_selection, iters)
             
@@ -128,7 +128,7 @@ def train(args):
         writer.flush()
 
         # save model after n epoch
-        if (epoch+1) % 50 == 0:
+        if (epoch+1) % 100 == 0:
             torch.save(sketch_decoder.state_dict(), os.path.join(args.output,'sketchdec_epoch_'+str(epoch+1)+'.pt'))
             torch.save(param_encoder.state_dict(), os.path.join(args.output,'paramenc_epoch_'+str(epoch+1)+'.pt'))
             torch.save(cmd_encoder.state_dict(), os.path.join(args.output,'cmdenc_epoch_'+str(epoch+1)+'.pt'))

@@ -12,9 +12,7 @@ EXT_PAD = 1
 EXTRA_PAD = 1
 R_PAD = 2
 NUM_FLAG = 9 
-
-SAMPLE_PROB = 0.95
-DROP_RATE = 0.2
+SAMPLE_PROB = 0.5 # or 0.95
 
 
 def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
@@ -125,10 +123,11 @@ class SketchDecoder(nn.Module):
       pixel_embed = self.pixel_embed(pixel_v)
       embed_inputs = pixel_embed + coord_embed
       
-      if is_training:
-        # dropout (optional)
-        drop_index = np.random.uniform(low=0.0, high=1.0, size=(embed_inputs.shape[0], embed_inputs.shape[1])) < DROP_RATE
-        embed_inputs[drop_index, :] = 0.0
+      #### REMOVED ####
+      # if is_training:  
+      #   # dropout (optional)
+      #   drop_index = np.random.uniform(low=0.0, high=1.0, size=(embed_inputs.shape[0], embed_inputs.shape[1])) < DROP_RATE
+      #   embed_inputs[drop_index, :] = 0.0
 
       embeddings = torch.cat([context_embedding, embed_inputs.transpose(0,1)], axis=0)
       decoder_inputs = self.pos_embed(embeddings) 

@@ -659,8 +659,6 @@ class OBJReconverter:
                             else:
                                 loop[-1].end_idx = loop[0].end_idx 
                                 loop[-1].end = loop[0].end 
-                    #print_loop(loop)
-                    #print('---------------')
 
         # Parse groups to json loop/curve profile
         extrusion = {}
