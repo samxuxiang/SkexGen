@@ -1,4 +1,4 @@
-# SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
+## SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
 
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
