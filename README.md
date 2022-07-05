@@ -57,6 +57,10 @@ Follow these steps to convert DeepCAD data to SkexGen format:
     --data_folder path/to/cad_network \
     --train_val_test_split path/to/deepcad/train_val_test_split.json \
     --hash_type 'e' 
+
+# create the invalid file list (under `data_utils`)
+  python invalid.py --datapath path/to/cad_network/ --bit 6
+
 ```
 
 When running `convert.py` some files in the DeepCAD dataset fail to generate valid solid models.  You may use the the `--verbose` option to see additional details about the problem files.   If the `convert.py` script hangs during processing it can be safely restarted and will continue from where it left off.
