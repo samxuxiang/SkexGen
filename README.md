@@ -56,7 +56,7 @@ You can download the SkexGen pretrained model from [checkpoint]()
 
 To train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
-    python train_s.py --data path/to/cad_network/train_unique_s.pkl \
+    python train_sketch.py --data path/to/cad_network/train_unique_s.pkl \
                       --output proj_log/your/exp \
                       --bit 6 --maxlen 200 --batchsize 128 --device 0
   ```
@@ -64,7 +64,7 @@ To train the sketch module (topology encoder, geometry encoder, sketch decoder):
 
 To train the extrude module (extrude encoder, extrude decoder):
   ```
-    python train_e.py --data path/to/cad_network/train_unique_e.pkl \
+    python train_extrude.py --data path/to/cad_network/train_unique_e.pkl \
                       --output proj_log/your/exp \
                       --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
