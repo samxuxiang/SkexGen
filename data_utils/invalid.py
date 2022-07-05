@@ -5,6 +5,7 @@ import pickle
 from utils import CADparser, write_obj
 from multiprocessing import Pool
 import argparse
+from tqdm import tqdm
 
 SKETCH_R = 1
 RADIUS_R = 1
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     total_fails = 0
     invalid_uids = []
 
-    for k, batch in enumerate(dataset.dataloader): 
+    for k, batch in enumerate(tqdm(dataset.dataloader)): 
         pixel_v_flat, pixel_v_mask, uids = batch
         iter_data = zip(pixel_v_flat.detach().cpu().numpy(), uids)
         load_iter = Pool(64).imap(raster, iter_data)
