@@ -29,13 +29,12 @@ Note this is only tested on CUDA 11.4 and up.
 ## Data
 
 ### Preprocess
-Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD)([Google Drive](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG)) and put it under `data` folder.
+Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD) ([Google Drive](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG)) and put it under `data` folder.
 
-Follow these steps to convert DeepCAD data to SkexGen format:
+Follow these steps to convert DeepCAD data to SkexGen format (under `utils` folder):
 ```bash
-# (under `utils` folder)
-# convert json to obj format and also save its stl 
-  python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
+# parse DeepCAD json to a simple obj format 
+  python convert.py --data_folder ../../data/cad_json --output_folder ../../data/cad_obj
 
 # normalize CAD 
   python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
