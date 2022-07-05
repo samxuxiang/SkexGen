@@ -1,15 +1,16 @@
 import os 
+from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Dir, gp_XYZ, gp_Ax3, gp_Trsf, gp_Pln
+from OCC.Display.SimpleGui import init_display
+from OCC.Core.StlAPI import StlAPI_Writer
+from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
+from pathlib import Path
+import os 
 import numpy as np 
 from pathlib import Path
 from geometry.obj_parser import OBJParser
 import math 
 from collections import OrderedDict
-import matplotlib.pyplot as plt
-import matplotlib.lines as lines
-import matplotlib.patches as patches
-import matplotlib
-matplotlib.use('Agg')
-import io
+from torch.optim.lr_scheduler import LambdaLR
 
 SKETCH_R = 1
 RADIUS_R = 1
@@ -24,6 +25,183 @@ EXTRA_PAD = 1
 R_PAD = 2
 
 
+def print_loop(loop):
+    for curve in loop:
+        if curve.type == 'arc':
+            print (f"{curve.start_idx} {curve.mid_idx} {curve.center_idx} {curve.end_idx} {curve.is_outer}")
+        elif curve.type == 'line':
+            print (f"{curve.start_idx} {curve.end_idx} {curve.is_outer}")
+        else:
+            print (f"{curve.center_idx} {curve.radius_idx} {curve.is_outer}")
+
+
+def round_float(point):
+    point['x'] = round(point['x'], 9)
+    point['y'] = round(point['y'], 9)
+    point['z'] = round(point['z'], 9)
+    return
+
+
+def find_files(folder, extension):
+    return sorted([Path(os.path.join(folder, f)) for f in os.listdir(folder) if f.endswith(extension)])
+
+
+
+def plot(shape_list):
+    pyqt5_display, start_display, add_menu, add_function_to_menu = init_display('qt-pyqt5')
+    for shape in shape_list:
+        pyqt5_display.DisplayShape(shape, update=True)
+    start_display()
+
+
+def write_stl_file(a_shape, filename, mode="ascii", linear_deflection=0.001, angular_deflection=0.5):
+    """ export the shape to a STL file
+    Be careful, the shape first need to be explicitely meshed using BRepMesh_IncrementalMesh
+    a_shape: the topods_shape to export
+    filename: the filename
+    mode: optional, "ascii" by default. Can either be "binary"
+    linear_deflection: optional, default to 0.001. Lower, more occurate mesh
+    angular_deflection: optional, default to 0.5. Lower, more accurate_mesh
+    """
+    if a_shape.IsNull():
+        raise AssertionError("Shape is null.")
+    if mode not in ["ascii", "binary"]:
+        raise AssertionError("mode should be either ascii or binary")
+    if os.path.isfile(filename):
+        print("Warning: %s file already exists and will be replaced" % filename)
+    # first mesh the shape
+    mesh = BRepMesh_IncrementalMesh(a_shape, linear_deflection, False, angular_deflection, True)
+    #mesh.SetDeflection(0.05)
+    mesh.Perform()
+    if not mesh.IsDone():
+        raise AssertionError("Mesh is not done.")
+
+    stl_exporter = StlAPI_Writer()
+    if mode == "ascii":
+        stl_exporter.SetASCIIMode(True)
+    else:  # binary, just set the ASCII flag to False
+        stl_exporter.SetASCIIMode(False)
+    stl_exporter.Write(a_shape, filename)
+
+    if not os.path.isfile(filename):
+        raise IOError("File not written to disk.")
+
+
+
+def same_plane(plane1, plane2):
+    same = True 
+    trans1 = plane1['pt']
+    trans2 = plane2['pt']
+    for key in trans1.keys():
+        v1 = trans1[key]
+        v2 = trans2[key]
+        if v1['x'] != v2['x'] or v1['y'] != v2['y'] or v1['z'] != v2['z']:
+            same = False 
+    return same 
+
+
+def create_xyz(xyz):
+    return gp_XYZ(
+        xyz["x"],
+        xyz["y"],
+        xyz["z"]
+    )
+
+
+def get_ax3(transform_dict):
+    origin = create_xyz(transform_dict["origin"])
+    x_axis = create_xyz(transform_dict["x_axis"])
+    y_axis = create_xyz(transform_dict["y_axis"])
+    z_axis = create_xyz(transform_dict["z_axis"])
+    # Create new coord (orig, Norm, x-axis)
+    axis3 = gp_Ax3(gp_Pnt(origin), gp_Dir(z_axis), gp_Dir(x_axis)) 
+    return axis3
+
+
+def get_transform(transform_dict):
+    axis3 = get_ax3(transform_dict)
+    transform_to_local = gp_Trsf()
+    transform_to_local.SetTransformation(axis3) 
+    return transform_to_local.Inverted()
+
+
+def create_sketch_plane(transform_dict):
+    axis3 = get_ax3(transform_dict)
+    return gp_Pln(axis3)
+
+
+def create_point(point_dict, transform):
+    pt2d = gp_Pnt(
+        point_dict["x"],
+        point_dict["y"],
+        point_dict["z"]
+    )
+    return pt2d.Transformed(transform)
+
+
+def create_vector(vec_dict, transform):
+    vec2d = gp_Vec(
+        vec_dict["x"],
+        vec_dict["y"],
+        vec_dict["z"]
+    )
+    return vec2d.Transformed(transform)
+
+
+def create_unit_vec(vec_dict, transform):
+    vec2d = gp_Dir(
+        vec_dict["x"],
+        vec_dict["y"],
+        vec_dict["z"]
+    )
+    return vec2d.Transformed(transform)
+
+
+def write_obj(file, curve_strings, curve_count, vertex_strings, vertex_count, extrude_info, refP_info):
+    """Write an .obj file with the curves and verts"""
+        
+    with open(file, "w") as fh:
+        # Write Meta info
+        fh.write("# WaveFront *.obj file\n")
+        fh.write(f"# Vertices: {vertex_count}\n")
+        fh.write(f"# Curves: {curve_count}\n")
+        fh.write("# ExtrudeOperation: "+extrude_info['set_op']+"\n")
+        fh.write("\n")
+
+        # Write vertex and curve
+        fh.write(vertex_strings)
+        fh.write("\n")
+        fh.write(curve_strings)
+        fh.write("\n")
+
+        #Write extrude value 
+        extrude_string = 'Extrude '
+        for value in extrude_info['extrude_values']:
+            extrude_string += str(value)+' '
+        fh.write(extrude_string)
+        fh.write("\n")
+
+        #Write refe plane value 
+        p_orig = parse3d(refP_info['pt']['origin'])
+        x_axis = parse3d(refP_info['pt']['x_axis'])
+        y_axis = parse3d(refP_info['pt']['y_axis'])
+        z_axis = parse3d(refP_info['pt']['z_axis'])
+        fh.write('T_origin '+p_orig)
+        fh.write("\n")
+        fh.write('T_xaxis '+x_axis)
+        fh.write("\n")
+        fh.write('T_yaxis '+y_axis)
+        fh.write("\n")
+        fh.write('T_zaxis '+z_axis)
+
+
+def parse3d(point3d):
+    x = point3d['x']
+    y = point3d['y']
+    z = point3d['z']
+    return str(x)+' '+str(y)+' '+str(z)
+
+
 
 def dequantize_verts(verts, n_bits=8, min_range=-0.5, max_range=0.5, add_noise=False):
   """Convert quantized vertices to floats."""
@@ -31,6 +209,13 @@ def dequantize_verts(verts, n_bits=8, min_range=-0.5, max_range=0.5, add_noise=F
   verts = verts.astype('float32')
   verts = verts * (max_range - min_range) / range_quantize + min_range
   return verts
+
+def quantize(data, n_bits=8, min_range=-1.0, max_range=1.0):
+    """Convert vertices in [-1., 1.] to discrete values in [0, n_bits**2 - 1]."""
+    range_quantize = 2**n_bits - 1
+    data_quantize = (data - min_range) * range_quantize / (max_range - min_range)
+    data_quantize = np.clip(data_quantize, a_min=0, a_max=range_quantize) # clip values
+    return data_quantize.astype('int32')
 
 
 def find_files(folder, extension):
@@ -506,7 +691,7 @@ def find_arc_geometry(a, b, c):
             end_angle_rads = angles[0]
 
         return center, radius, start_angle_rads, end_angle_rads
-        
+
 
 class CADparser:
     """ Parse into OBJ files """
@@ -704,58 +889,26 @@ class CADparser:
         return vertex_strings
 
 
-def write_obj(save_folder, data):
-    for idx, write_data in enumerate(data):
-        obj_name = Path(save_folder).stem + '_'+ str(idx).zfill(3) + "_param.obj"
-        obj_file = Path(save_folder) / obj_name
-        extrude_param = write_data['extrude']
-        vertex_strings = write_data['vertex']
-        curve_strings = write_data['curve']
+def get_constant_schedule_with_warmup(optimizer, num_warmup_steps, last_epoch = -1):
+    """
+    Create a schedule with a constant learning rate preceded by a warmup period during which the learning rate
+    increases linearly between 0 and the initial lr set in the optimizer.
 
-        """Write an .obj file with the curves and verts"""
-        if extrude_param['op'] == 1: #'add'
-            set_op = 'NewBodyFeatureOperation'
-        elif extrude_param['op'] == 2: #'cut'
-            set_op = 'CutFeatureOperation'
-        elif extrude_param['op'] == 3: #'cut'
-            set_op = 'IntersectFeatureOperation'
+    Args:
+        optimizer (:class:`~torch.optim.Optimizer`):
+            The optimizer for which to schedule the learning rate.
+        num_warmup_steps (:obj:`int`):
+            The number of steps for the warmup phase.
+        last_epoch (:obj:`int`, `optional`, defaults to -1):
+            The index of the last epoch when resuming training.
 
-        with open(obj_file, "w") as fh:
-            # Write Meta info
-            fh.write("# WaveFront *.obj file\n")
-            fh.write("# ExtrudeOperation: "+set_op+"\n")
-            fh.write("\n")
+    Return:
+        :obj:`torch.optim.lr_scheduler.LambdaLR` with the appropriate schedule.
+    """
 
-            # Write vertex and curve
-            fh.write(vertex_strings)
-            fh.write("\n")
-            fh.write(curve_strings)
-            fh.write("\n")
+    def lr_lambda(current_step: int):
+        if current_step < num_warmup_steps:
+            return float(current_step) / float(max(1.0, num_warmup_steps))
+        return 1.0
 
-            #Write extrude value 
-            extrude_string = 'Extrude '
-            for value in extrude_param['value']:
-                extrude_string += str(value)+' '
-            fh.write(extrude_string)
-            fh.write("\n")
-
-            #Write refe plane value 
-            p_orig = parse3d(extrude_param['T'])
-            x_axis = parse3d(extrude_param['R'][0:3])
-            y_axis = parse3d(extrude_param['R'][3:6])
-            z_axis = parse3d(extrude_param['R'][6:9])
-            fh.write('T_origin '+p_orig)
-            fh.write("\n")
-            fh.write('T_xaxis '+x_axis)
-            fh.write("\n")
-            fh.write('T_yaxis '+y_axis)
-            fh.write("\n")
-            fh.write('T_zaxis '+z_axis)
-
-
-def parse3d(point3d):
-    x = point3d[0]
-    y = point3d[1]
-    z = point3d[2]
-    return str(x)+' '+str(y)+' '+str(z)
-
+    return LambdaLR(optimizer, lr_lambda, last_epoch=last_epoch)

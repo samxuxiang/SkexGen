@@ -1,8 +1,8 @@
 import os
 import torch
 import argparse
-from model.ar import ARModel
-from dataset import ARDataset
+from model.code import CodeModel
+from dataset import CodeDataset
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.tensorboard import SummaryWriter
@@ -15,13 +15,13 @@ def train(args):
     device = torch.device("cuda:0")
     
     # Initialize dataset loader
-    dataset = ARDataset(datapath=args.input, maxlen=args.seqlen) 
+    dataset = CodeDataset(datapath=args.input, maxlen=args.seqlen) 
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
                                              num_workers=4)
     # Initialize vertex model
-    model = ARModel(
+    model = CodeModel(
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 

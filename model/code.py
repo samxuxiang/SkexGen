@@ -66,15 +66,14 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-class ARModel(nn.Module):
-  """Autoregressive generative model of quantized mesh vertices."""
+class CodeModel(nn.Module):
 
   def __init__(self,
                config,
                max_len=8,
                classes = 512,
                name='ar_model'):
-    super(ARModel, self).__init__()
+    super(CodeModel, self).__init__()
     self.embed_dim = config['embed_dim']
     self.max_len = max_len
     self.dropout = config['dropout_rate']

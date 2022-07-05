@@ -29,27 +29,28 @@ Note this is only tested on CUDA 11.4 and up.
 ## Data
 
 ### Preprocess
-Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD) and put it under `data` folder.
+Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD), [Google Drive](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG), and put it under `data` folder.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
-# convert json to obj format and also save its stl (under `occ_utils` folder)
+# (under `utils` folder)
+# convert json to obj format and also save its stl 
   python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
 
-# normalize CAD (under `occ_utils` folder)
+# normalize CAD 
   python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
 
-# parse obj to network-friendly sequence and save as pickle (under `data_utils` folder)
+# parse obj to network-friendly sequence and save as pickle 
   python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
 
-# remove sketch training data duplicates (under `data_utils` folder)
+# remove sketch training data duplicates
   python deduplicate.py --datapath path/to/cad_network --hash_type s
 
-# remove extrude training data duplicates (under `data_utils` folder)
+# remove extrude training data duplicates 
   python deduplicate.py --datapath path/to/cad_network --hash_type e
 ```
 ### Pretrained Models
-You can download the SkexGen pretrained model from [checkpoint]()
+Download pretrained SkexGen model from [here]()
 
 
 ## Training
@@ -104,13 +105,14 @@ Randomly sample the codes and decode to sketch-and-extrude:
 
 Evaluate the results by COV, MMD and JSD:
 ```bash
-# convert generated sketch-and-extrude to stl (under occ_utils folder)
+# (under utils folder)
+# convert generated sketch-and-extrude to stl 
   python visual_obj.py --data_folder proj_log/your/exp/samples
 
-# uniformly sample 2000 points on the CAD model (under occ_utils folder)
+# uniformly sample 2000 points on the CAD model
   python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
 
-# evaluate generation performance (under home folder)
+# evaluate generation performance 
   python eval_cad.py --fake proj_log/your/exp/samples \
                      --real path/to/cad_network/test_obj
 ```

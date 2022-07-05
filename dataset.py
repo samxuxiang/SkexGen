@@ -134,8 +134,8 @@ class SketchData(torch.utils.data.Dataset):
                pix_seq_aug, xy_seq_aug, mask_aug
 
 
-class ARDataset(torch.utils.data.Dataset):
-    """ ar dataset """
+class CodeDataset(torch.utils.data.Dataset):
+    """ Code dataset """
     def __init__(self, datapath, maxlen):
         with open(datapath, 'rb') as f:
             self.data = pickle.load(f)
