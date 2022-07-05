@@ -84,6 +84,7 @@ To train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_s.py --data path/to/cad_network/train_unique_s.pkl \
                       --output proj_log/your/exp \
+                      --invalid path/to/cad_network/train_invalid_s.pkl \
                       --bit 6 --maxlen 250 --batchsize 256 --device '0' 
   ```
   `maxlen`: sketch sequence length
