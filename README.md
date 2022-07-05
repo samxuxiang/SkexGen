@@ -54,7 +54,7 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
-Download pre-processed SkexGen data from [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+Download pre-processed SkexGen data [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
 
 
 
