@@ -193,11 +193,13 @@ if __name__ == "__main__":
         project_folders += glob(str(cur_dir)+'/*/')
 
     # Parallel
-    threads = 50  # number of threads in your pc 
+    threads = 36  # number of threads in your pc 
     convert_iter = Pool(threads).imap(run_parallel, project_folders)
     for msg in tqdm(convert_iter, total=len(project_folders)):
-        if len(msg)>0:
-            print(f'Normalization Error: {msg}')
+        ### Surpress Warnings ###
+        # if len(msg)>0:
+        #     print(f'Normalization Error: {msg}')
+        pass
         
     
 

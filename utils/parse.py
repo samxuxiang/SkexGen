@@ -15,7 +15,7 @@ if __name__ == "__main__":
         os.makedirs(args.output)
         
     # Start creating dataset 
-    parser = SE(start=0, end=100, datapath=args.input, bit=args.bit, threads=50)
+    parser = SE(start=0, end=100, datapath=args.input, bit=args.bit, threads=36) # number of threads in your pc
     train_samples, test_samples, val_samples = parser.load_all_obj()
 
     # Save to file 

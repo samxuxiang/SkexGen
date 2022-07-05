@@ -34,13 +34,13 @@ Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCA
 Follow these steps to convert DeepCAD data to SkexGen format (under `utils` folder):
 ```bash
 # parse DeepCAD json to a simple obj format 
-  python convert.py --data_folder ../../data/cad_json --output_folder ../../data/cad_obj
+  python convert.py --data_folder ../data/cad_json --output_folder ../data/cad_obj
 
-# normalize CAD 
-  python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
+# normalize CAD and update the obj file
+  python normalize.py --data_folder ../data/cad_obj --out_folder ../data/cad_norm
 
-# parse obj to network-friendly sequence and save as pickle 
-  python parse.py --input path/to/cad_norm --output path/to/cad_network --bit 6
+# parse obj to primitive sequence 
+  python parse.py --input ../data/cad_norm --output ../data/cad_data --bit 6
 
 # remove sketch training data duplicates
   python deduplicate.py --datapath path/to/cad_network --hash_type s
