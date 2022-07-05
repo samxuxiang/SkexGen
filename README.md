@@ -1,4 +1,4 @@
-# SkexGen: Generating CAD Construction Sequences by Autoregressive VAE with Disentangled Codebooks
+# SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
 
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
@@ -49,13 +49,8 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python deduplicate.py --datapath path/to/cad_network --hash_type e
 ```
 ### Pretrained Models
-SkexGen trained under different settings 
+You can download the SkexGen pretrained model from [checkpoint]()
 
-| **Sketch MaxLen** | **Extrude MaxLen** | **Download** |
-|--------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 200              | 3       | [checkpoint]() | 
-| 200              | 4       | [checkpoint]() | 
-| 200              | 5       | [checkpoint]() | 
 
 ## Training
 
@@ -125,11 +120,10 @@ To evaluate the results by COV, MMD and JSD:
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
-@inproceedings{xxx,
-  title={SkexGen: Generating CAD Construction Sequences by Autoregressive VAE with Disentangled Codebooks},
+@inproceedings{ICML,
+  title={SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
   author={xxx},
-  booktitle={xxx},
-  year={xxx}
+  year={2022}
 }
 ```
 
