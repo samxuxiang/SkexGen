@@ -42,14 +42,15 @@ Follow these steps to convert DeepCAD data to SkexGen format (under `utils` fold
 # parse obj to primitive sequence 
   python parse.py --input ../data/cad_norm --output ../data/cad_data --bit 6
 
-# remove sketch training data duplicates
-  python deduplicate.py --datapath path/to/cad_network --hash_type s
+# remove duplicated sketch data
+  python deduplicate.py --datapath ../data/cad_data --hash_type s
 
-# remove extrude training data duplicates 
-  python deduplicate.py --datapath path/to/cad_network --hash_type e
+# remove duplicated extrude data
+  python deduplicate.py --datapath ../data/cad_data --hash_type e
 ```
-### Pretrained Models
-Download pretrained SkexGen model from [here]()
+
+Download pre-processed SkexGen data from [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+
 
 
 ## Training
@@ -87,9 +88,10 @@ To train the code selector:
                        --batchsize 512 --device 0 \
                        --code 1000 --seqlen 10
   ```
-  `seqlen`: 4 topology codes, 2 geometry codes, 4 extrude codes 
+  `seqlen`: 4 topology, 2 geometry, 4 extrude 
   `code`: max size of codebook is 1000
 
+Download pretrained SkexGen model from [here]()
 
 
 ## Testing and Evaluation

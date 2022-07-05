@@ -143,7 +143,7 @@ if __name__ == "__main__":
         else:
             pass
 
-    with open(os.path.join(args.data_path,"train_unique_"+args.hash_type+".pkl"), "wb") as tf:
+    with open(os.path.join(args.datapath, "train_deduplicate_"+args.hash_type+".pkl"), "wb") as tf:
         pickle.dump(trainset, tf)
 
     print("Duplicate Stats:")
