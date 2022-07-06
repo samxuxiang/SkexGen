@@ -3,7 +3,7 @@
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
 **ICML 2022**  
-[website](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [video]()
+[project](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [youtube]() | [bilibili]()
 
 
 ## Installation
@@ -11,10 +11,10 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 ### Environment
 * Linux
 * Python >= 3.8
-* PyTorch >= 1.10.1
+* PyTorch >= 1.10
 
 ### Dependencies
-* Install [PyTorch 1.10.1](https://pytorch.org/get-started/previous-versions/) with the correct CUDA version.
+* Install [PyTorch 1.10](https://pytorch.org/get-started/previous-versions/) with the correct CUDA version.
 * Install other dependencies:
     ```
     pip install -r requirements.txt
@@ -53,7 +53,7 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
-Download the [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+Download the already [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
 
 
 
