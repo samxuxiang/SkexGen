@@ -1,4 +1,4 @@
-## SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
+# SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
 
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
@@ -28,7 +28,6 @@ Note: only tested on CUDA 11.4.
  
 ## Data
 
-### Preprocess
 Download the [raw json](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG) from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD). Unzip it under the data folder.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
@@ -60,7 +59,7 @@ Download SkexGen [pre-processed data](https://drive.google.com/file/d/1so_CCGLIh
 
 ## Training
 
-Train sketch module (topology encoder, geometry encoder, sketch decoder):
+Train sketch branch (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
                            --output proj_log/exp_sketch \
@@ -69,7 +68,7 @@ Train sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
   `maxlen`: sketch sequence length (default 200)
 
-Train extrude module (extrude encoder, extrude decoder):
+Train extrude branch (extrude encoder, extrude decoder):
   ```
     python train_extrude.py --data data/cad_data/train_deduplicate_e.pkl \
                             --output proj_log/exp_extrude \
@@ -117,15 +116,15 @@ Random generation:
   python visual_obj.py --data_folder proj_log/samples 
 
 # render and visualize 
-python cad_img.py  --input_dir proj_log/samples --output_dir proj_log/samples_visual
+  python cad_img.py  --input_dir proj_log/samples --output_dir proj_log/samples_visual
 ```
                 
 
-Evaluate the results by COV, MMD and JSD:
+Evaluate the results:
 ```bash
 # Under utils folder:
 
-# uniformly sample 2000 points on the CAD model
+# uniformly sample 2000 points 
   python sample_points.py --in_dir proj_log/samples --out_dir pcd
 
 # evaluate generation performance 
