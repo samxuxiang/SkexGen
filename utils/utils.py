@@ -202,6 +202,61 @@ def parse3d(point3d):
     return str(x)+' '+str(y)+' '+str(z)
 
 
+def parse3d_sample(point3d):
+    x = point3d[0]
+    y = point3d[1]
+    z = point3d[2]
+    return str(x)+' '+str(y)+' '+str(z)
+
+
+def write_obj_sample(save_folder, data):
+    for idx, write_data in enumerate(data):
+        obj_name = Path(save_folder).stem + '_'+ str(idx).zfill(3) + "_param.obj"
+        obj_file = Path(save_folder) / obj_name
+        extrude_param = write_data['extrude']
+        vertex_strings = write_data['vertex']
+        curve_strings = write_data['curve']
+
+        """Write an .obj file with the curves and verts"""
+        if extrude_param['op'] == 1: #'add'
+            set_op = 'NewBodyFeatureOperation'
+        elif extrude_param['op'] == 2: #'cut'
+            set_op = 'CutFeatureOperation'
+        elif extrude_param['op'] == 3: #'cut'
+            set_op = 'IntersectFeatureOperation'
+
+        with open(obj_file, "w") as fh:
+            # Write Meta info
+            fh.write("# WaveFront *.obj file\n")
+            fh.write("# ExtrudeOperation: "+set_op+"\n")
+            fh.write("\n")
+
+            # Write vertex and curve
+            fh.write(vertex_strings)
+            fh.write("\n")
+            fh.write(curve_strings)
+            fh.write("\n")
+
+            #Write extrude value 
+            extrude_string = 'Extrude '
+            for value in extrude_param['value']:
+                extrude_string += str(value)+' '
+            fh.write(extrude_string)
+            fh.write("\n")
+
+            #Write refe plane value 
+            p_orig = parse3d_sample(extrude_param['T'])
+            x_axis = parse3d_sample(extrude_param['R'][0:3])
+            y_axis = parse3d_sample(extrude_param['R'][3:6])
+            z_axis = parse3d_sample(extrude_param['R'][6:9])
+            fh.write('T_origin '+p_orig)
+            fh.write("\n")
+            fh.write('T_xaxis '+x_axis)
+            fh.write("\n")
+            fh.write('T_yaxis '+y_axis)
+            fh.write("\n")
+            fh.write('T_zaxis '+z_axis)
+
 
 def dequantize_verts(verts, n_bits=8, min_range=-0.5, max_range=0.5, add_noise=False):
   """Convert quantized vertices to floats."""

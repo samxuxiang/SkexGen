@@ -5,7 +5,10 @@ from multiprocessing import Pool
 from model.code import CodeModel
 from model.decoder import SketchDecoder, EXTDecoder
 from model.encoder import PARAMEncoder, CMDEncoder, EXTEncoder
-from utils import CADparser, write_obj
+
+import sys
+sys.path.insert(0, 'utils')
+from utils import CADparser, write_obj_sample
 
 
 
@@ -26,7 +29,7 @@ def sample(args):
         code_len = 4,
         num_code = 500,
     )
-    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_300.pt')))
+    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_1.pt')))
     cmd_encoder = cmd_encoder.to(device).eval()
 
     param_encoder = PARAMEncoder(
@@ -42,7 +45,7 @@ def sample(args):
         code_len = 2,
         num_code = 1000,
     )
-    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_300.pt')))
+    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_1.pt')))
     param_encoder = param_encoder.to(device).eval()
 
     sketch_decoder = SketchDecoder(
@@ -57,7 +60,7 @@ def sample(args):
         cmd_len=124,
         quantization_bits=args.bit,
     )
-    sketch_decoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'sketchdec_epoch_300.pt')))
+    sketch_decoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'sketchdec_epoch_1.pt')))
     sketch_decoder = sketch_decoder.to(device).eval()
     
     ext_encoder = EXTEncoder(
@@ -73,7 +76,7 @@ def sample(args):
         code_len = 4,
         num_code = 1000,
     )
-    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_200.pt')))
+    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_1.pt')))
     ext_encoder = ext_encoder.to(device).eval()
 
     ext_decoder = EXTDecoder(
@@ -87,21 +90,21 @@ def sample(args):
         max_len=96,
         quantization_bits=args.bit,
     )
-    ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_200.pt')))
+    ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_1.pt')))
     ext_decoder = ext_decoder.to(device).eval()
 
     code_model = CodeModel(
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 
-            'num_layers': 6,
+            'num_layers': 4,
             'num_heads': 8,
             'dropout_rate': 0.0
         },
         max_len=10,
         classes=1000,
     )
-    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1000.pt')))
+    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1.pt')))
     code_model = code_model.to(device).eval()
 
     print('Random Generation...')
@@ -142,9 +145,9 @@ def sample(args):
             latent_sketch = torch.cat((latent_cmd, latent_param), 1)
                 
         # Parallel Sample Sketches 
-        sample_pixels, latent_ext_samples = sketch_decoder.sample(n_samples=latent_sketch.shape[0], latent_z=latent_sketch, latent_ext=latent_ext)
+        sample_pixels, latent_ext_samples = sketch_decoder.sample(n_samples=latent_sketch.shape[0], \
+                        latent_z=latent_sketch, latent_ext=latent_ext)
         _latent_ext_ = torch.vstack(latent_ext_samples)
-        assert len(_latent_ext_) == len(sample_pixels)
 
         # Parallel Sample Extrudes 
         sample_merges = ext_decoder.sample(n_samples=len(sample_pixels), latent_z=_latent_ext_, sample_pixels=sample_pixels)
@@ -154,7 +157,7 @@ def sample(args):
     # # Parallel raster OBJ
     gen_data = []
 
-    load_iter = Pool(36).imap(raster_cad, cad)
+    load_iter = Pool(36).imap(raster_cad, cad) # number of threads in your pc
     for data_sample in load_iter:
         gen_data += data_sample
     print(len(gen_data))
@@ -165,7 +168,7 @@ def sample(args):
         output = os.path.join(args.output, str(index).zfill(5))
         if not os.path.exists(output):
             os.makedirs(output)
-        write_obj(output, value)
+        write_obj_sample(output, value)
 
 
 def raster_cad(pixels):   
@@ -179,15 +182,12 @@ def raster_cad(pixels):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=str, required=True, help="Ouput folder containing the sampled results")
-    parser.add_argument("--weight", type=str, required=True, help="Input folder containing the saved model")
-    parser.add_argument("--ext_weight", type=str, required=True, help="Input folder containing the saved model")
-    parser.add_argument("--epoch", type=int, required=True, help="weight epoch")
-    parser.add_argument("--device", type=int, help="CUDA Device Index")
-    parser.add_argument("--maxlen", type=int, help="maximum token length")
-    parser.add_argument("--data", type=str, required=True)
-    parser.add_argument("--invalid", type=str, required=True)
-    parser.add_argument("--bit", type=int, help="quantization bit")
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--sketch_weight", type=str, required=True)
+    parser.add_argument("--ext_weight", type=str, required=True)
+    parser.add_argument("--code_weight", type=str, required=True)
+    parser.add_argument("--device", type=int, required=True)
+    parser.add_argument("--bit", type=int, required=True)
     args = parser.parse_args()
     
     sample(args)

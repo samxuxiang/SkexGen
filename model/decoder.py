@@ -151,9 +151,6 @@ class SketchDecoder(nn.Module):
     top_k = 0
     top_p = SAMPLE_PROB
 
-    left_list = np.array(list(range(n_samples)))
-    done_list = []
-
     # Mapping from pixel index to xy coordiante
     pixel2xy = {}
     x=np.linspace(0, 2**self.bits-1, 2**self.bits)
@@ -209,7 +206,6 @@ class SketchDecoder(nn.Module):
         done_pixs = pixel_seq[done_idx] 
         done_xys = xy_seq[done_idx]
         done_ext = latent_ext[done_idx]
-        done_list.append(left_list[done_idx])
        
         for pix, xy, ext in zip(done_pixs, done_xys, done_ext):
           pix = pix.detach().cpu().numpy()
@@ -224,12 +220,11 @@ class SketchDecoder(nn.Module):
       else:
         pixel_seq = pixel_seq[left_idx]
         xy_seq = xy_seq[left_idx]
-        left_list = left_list[left_idx]
         if latent_z is not None:
           latent_z = latent_z[left_idx]
           latent_ext = latent_ext[left_idx]
     
-    return pix_samples, latent_ext_samples, np.hstack(done_list)
+    return pix_samples, latent_ext_samples
 
 
 class EXTDecoder(nn.Module):
@@ -304,9 +299,6 @@ class EXTDecoder(nn.Module):
     top_k = 0
     top_p = SAMPLE_PROB
 
-    left_list = np.array(list(range(n_samples)))
-    done_list = []
-
     # Sample per token
     for k in range(self.max_len):
       if k == 0:
@@ -351,7 +343,6 @@ class EXTDecoder(nn.Module):
       if len(done_idx) > 0:
         done_exts = pixel_seq[done_idx] 
         done_pixs = [sample_pixels[x] for x in done_idx]
-        done_list.append(left_list[done_idx])
         
         for pix_job, ext_job in zip(done_pixs, done_exts):
           ext_job = ext_job.detach().cpu().numpy()
@@ -368,16 +359,14 @@ class EXTDecoder(nn.Module):
           merged = np.hstack(merged)
           samples.append(merged)
       
-      
       left_idx = np.where(next_pixels!=0)[0]
       if len(left_idx) == 0:
         break # no more jobs to do
       else:
         pixel_seq = pixel_seq[left_idx]
         flag_seq = flag_seq[left_idx]
-        left_list = left_list[left_idx]
         if latent_z is not None:
           latent_z = latent_z[left_idx]
           sample_pixels = [sample_pixels[x] for x in left_idx]
 
-    return samples, np.hstack(done_list)
+    return samples

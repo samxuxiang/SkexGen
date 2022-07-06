@@ -9,7 +9,7 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 ## Installation
 
 ### Environment
-* **Tested OS:** Linux
+* Linux
 * Python >= 3.8
 * PyTorch >= 1.10.1
 
@@ -23,7 +23,7 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 
 ### Docker
 We also provide the docker image for running SkexGen. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). \
-Note this is only tested on CUDA 11.4 and up. 
+Note: only tested on CUDA 11.4. 
 
  
 ## Data
@@ -105,7 +105,7 @@ Download our pretrained SkexGen model [here]()
 Randomly sample the codes and decode to sketch-and-extrude: 
   ```
     python sample.py --sketch_weight proj_log/exp_sketch \
-                     --ext_weight proj_log/exp_ext \
+                     --ext_weight proj_log/exp_extrude \
                      --code_weight proj_log/exp_code \
                      --device 0 --bit 6 \
                      --output proj_log/samples 
