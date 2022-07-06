@@ -23,7 +23,7 @@ def train(args):
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
-                                             num_workers=8,
+                                             num_workers=5,
                                              pin_memory=True)
    
     # Initialize models
@@ -102,9 +102,6 @@ def train(args):
                 optimizer.step()
                 scheduler.step()  # linear warm up to 1e-3
                 iters += 1
-
-        torch.save(ext_encoder.state_dict(), os.path.join(args.output,'extenc_epoch_'+str(epoch+1)+'.pt'))
-        torch.save(ext_decoder.state_dict(), os.path.join(args.output,'extdec_epoch_'+str(epoch+1)+'.pt'))
 
         writer.flush()
         # save model after n epoch

@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 def train(args):
-    # Initialize gpu device
+    # gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     device = torch.device("cuda:0")
     
@@ -19,7 +19,7 @@ def train(args):
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
-                                             num_workers=4)
+                                             num_workers=5)
     # Initialize vertex model
     model = CodeModel(
         config={
@@ -73,9 +73,10 @@ def train(args):
             iters += 1
 
         writer.flush()
+
         # save model after n epoch
         if (epoch+1) % 500 == 0:
-            torch.save(model.state_dict(), os.path.join(args.output,'ar_epoch_'+str(epoch+1)+'.pt'))
+            torch.save(model.state_dict(), os.path.join(args.output,'code_epoch_'+str(epoch+1)+'.pt'))
 
     writer.close()
 
@@ -83,12 +84,11 @@ def train(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
-    parser.add_argument("--output", type=str, help="Output folder to save the data [default: output]")
-    parser.add_argument("--batchsize", type=int, help="Training Batch Size")
-    parser.add_argument("--bits", type=int, help="Qauntization bit number")
-    parser.add_argument("--device", type=str, help="CUDA Device Index")
-    parser.add_argument("--seqlen", type=int)
-    parser.add_argument("--code", type=int)
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--batchsize", type=int, required=True)
+    parser.add_argument("--device", type=str, required=True)
+    parser.add_argument("--seqlen", type=int, required=True)
+    parser.add_argument("--code", type=int, required=True)
     args = parser.parse_args()
 
     # Create training folder

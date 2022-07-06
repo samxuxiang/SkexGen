@@ -60,7 +60,7 @@ Download our pre-processed SkexGen data [here](https://drive.google.com/file/d/1
 
 ## Training
 
-Train the sketch module (topology encoder, geometry encoder, sketch decoder):
+Train sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
     python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
                            --output proj_log/exp_sketch \
@@ -69,30 +69,31 @@ Train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
   `maxlen`: sketch sequence length (default 200)
 
-Train the extrude module (extrude encoder, extrude decoder):
+Train extrude module (extrude encoder, extrude decoder):
   ```
     python train_extrude.py --data data/cad_data/train_deduplicate_e.pkl \
-                      --output proj_log/exp_extrude \
-                      --bit 6 --maxlen 5 --batchsize 128 --device 0
+                            --output proj_log/exp_extrude \
+                            --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
   `maxlen`: number of extudes (default 5)
 
 
-Extract training dataset codes:
+Extract codes:
   ```
-    python extract_code.py --weight proj_log/your/exp \
-                           --epoch 300 --device 0 --maxlen 200 --bit 6 \
-                           --output proj_log/your/exp/codes \
-                           --data path/to/cad_network/train_unique_s.pkl \
-                           --invalid path/to/cad_network/train_invalid_s.pkl 
+    python extract_code.py --sketch_weight proj_log/exp_sketch \
+                           --ext_weight proj_log/exp_extrude \
+                           --epoch 1 --device 0 --maxlen 200 --bit 6 \
+                           --output proj_log/exp_code \
+                           --data data/cad_data/train_deduplicate_s.pkl \
+                           --invalid data/cad_data/train_invalid.pkl 
   ```
 
-Train the code selector: 
+Train code selector (random generation): 
   ```
-    python train_code.py --input proj_log/your/exp/codes/train_code.pkl \
-                       --output proj_log/your/exp \
-                       --batchsize 512 --device 0 \
-                       --code 1000 --seqlen 10
+    python train_code.py --input proj_log/exp_code/code.pkl \
+                         --output proj_log/exp_code \
+                         --batchsize 512 --device 0 \
+                         --code 1000 --seqlen 10
   ```
   `seqlen`: 4 topology, 2 geometry, 4 extrude 
   `code`: max size of codebook is 1000
