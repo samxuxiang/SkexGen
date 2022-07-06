@@ -56,7 +56,7 @@ def main():
         input_path = pathlib.Path(folder)
         files += list(input_path.glob("*.st*p"))
     
-    files = files[1000:2000]
+    files = files[3000:]
 
     output_path = pathlib.Path(args.output_dir)
     if not output_path.exists():

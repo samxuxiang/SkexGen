@@ -97,7 +97,7 @@ Train code selector (random generation):
   `seqlen`: 4 topology, 2 geometry, 4 extrude, 
   `code`: max size of codebook is 1000
 
-Download SkexGen [pretrained model]()
+Download SkexGen [pretrained models]()
 
 
 ## Evaluation
@@ -112,11 +112,11 @@ Random generation:
 
 # Under utils folder:
 
-# convert generated sketch-and-extrude to stl format
-  python visual_obj.py --data_folder proj_log/samples 
+# convert generated sketch-and-extrude to stl format (use timeout to prevent occ hanging)
+  timeout 160 python visual_obj.py --data_folder ../proj_log/samples 
 
 # render and visualize 
-  python cad_img.py  --input_dir proj_log/samples --output_dir proj_log/samples_visual
+  python cad_img.py  --input_dir ../proj_log/samples --output_dir ../proj_log/samples_visual
 ```
                 
 
@@ -125,13 +125,13 @@ Evaluate the results:
 # Under utils folder:
 
 # uniformly sample 2000 points 
-  python sample_points.py --in_dir proj_log/samples --out_dir pcd
+  python sample_points.py --in_dir ../proj_log/samples --out_dir pcd
 
 # evaluate generation performance 
-  python eval_cad.py --fake proj_log/samples \
-                     --real data/test_eval
+  python eval_cad.py --fake ../proj_log/samples \
+                     --real ../data/test_eval
 ```
-Download [test_eval](https://drive.google.com/file/d/1PiVDm6pLGsz4Y_GZZ-J_ODqOGaAOKy9U/view?usp=sharing) and unzip it under the data folder. This contains the sampled point clouds from test set. You need it for evaluation 
+Download [test_eval]() and unzip it under the data folder. This contains the sampled point clouds from test set. You need it for evaluation 
 
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
