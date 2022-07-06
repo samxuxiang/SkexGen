@@ -15,6 +15,7 @@ from chamfer_distance import ChamferDistance
 
 
 N_POINTS = 2000
+NUM_TRHEADS = 36
 
 
 def find_files(folder, extension):
@@ -261,7 +262,7 @@ def main():
     # Load reference pcd 
     ref_pcs = []
     project_folders = sorted(glob(args.real+'/*/'))   
-    load_iter = Pool(36).imap(collect_pc, project_folders)
+    load_iter = Pool(NUM_TRHEADS).imap(collect_pc, project_folders)  
     for pc in tqdm(load_iter, total=len(project_folders)):
         if len(pc) > 0:
             ref_pcs.append(pc)
@@ -271,7 +272,7 @@ def main():
     # Load fake pcd 
     sample_pcs = []
     project_folders = sorted(glob(args.fake+'/*/'))
-    load_iter = Pool(36).imap(collect_pc, project_folders)
+    load_iter = Pool(NUM_TRHEADS).imap(collect_pc, project_folders)
     for pc in tqdm(load_iter, total=len(project_folders)):
         if len(pc) > 0:
             sample_pcs.append(pc)

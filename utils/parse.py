@@ -3,6 +3,9 @@ import argparse
 from dataset import SE
 import pickle
 
+NUM_TRHEADS = 36
+NUM_FOLDERS = 100
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True, help="Input folder of the CAD obj (after normalization)")
@@ -15,7 +18,7 @@ if __name__ == "__main__":
         os.makedirs(args.output)
         
     # Start creating dataset 
-    parser = SE(start=0, end=100, datapath=args.input, bit=args.bit, threads=36) # number of threads in your pc
+    parser = SE(start=0, end=NUM_FOLDERS, datapath=args.input, bit=args.bit, threads=NUM_TRHEADS) # number of threads in your pc
     train_samples, test_samples, val_samples = parser.load_all_obj()
 
     # Save to file 

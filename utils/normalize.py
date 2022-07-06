@@ -32,6 +32,9 @@ def raise_timeout(signum, frame):
     raise TimeoutError
 
 
+NUM_TRHEADS = 36 
+NUM_FOLDERS = 100 
+
 class NormalizeSE:
 
     def __init__(self, cube_size, norm_factor, extrude_size, sketch_size):
@@ -188,13 +191,12 @@ if __name__ == "__main__":
 
     data_folder = Path(args.data_folder)
     project_folders = []
-    for idx in range(100): # all 100 folder
+    for idx in range(NUM_FOLDERS): 
         cur_dir = data_folder / str(idx).zfill(4)
         project_folders += glob(str(cur_dir)+'/*/')
 
     # Parallel
-    threads = 36  # number of threads in your pc 
-    convert_iter = Pool(threads).imap(run_parallel, project_folders)
+    convert_iter = Pool(NUM_TRHEADS).imap(run_parallel, project_folders)
     for msg in tqdm(convert_iter, total=len(project_folders)):
         ### Surpress Warnings ###
         # if len(msg)>0:

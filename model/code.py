@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import pdb 
 
 
-SAMPLE_PROB = 0.95
+SAMPLE_PROB = 0.99
 
 
 def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):

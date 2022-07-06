@@ -10,7 +10,9 @@ import sys
 sys.path.insert(0, 'utils')
 from utils import CADparser, write_obj_sample
 
-
+NUM_TRHEADS = 36 
+NUM_SAMPLE = 20000
+BS = 1024
 
 def sample(args):
     # Initialize gpu device
@@ -97,23 +99,21 @@ def sample(args):
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 
-            'num_layers': 4,
+            'num_layers': 8,
             'num_heads': 8,
-            'dropout_rate': 0.0
+            'dropout_rate': 0.1
         },
         max_len=10,
         classes=1000,
     )
-    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1000.pt')))
+    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_800.pt')))
     code_model = code_model.to(device).eval()
 
     print('Random Generation...')
     if not os.path.exists(args.output):
         os.makedirs(args.output)
     
-    NUM_SAMPLE = 20000
     cad = []
-    BS = 1024
     cmd_codebook = cmd_encoder.vq_vae._embedding
     param_codebook = param_encoder.vq_vae._embedding
     ext_codebook = ext_encoder.vq_vae._embedding
@@ -157,7 +157,7 @@ def sample(args):
     # # Parallel raster OBJ
     gen_data = []
 
-    load_iter = Pool(36).imap(raster_cad, cad) # number of threads in your pc
+    load_iter = Pool(NUM_TRHEADS).imap(raster_cad, cad) 
     for data_sample in load_iter:
         gen_data += data_sample
     print(len(gen_data))

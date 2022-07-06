@@ -90,7 +90,6 @@ def extract(args):
             total_z.append(codes)
 
     code = np.unique(np.vstack(total_z), return_counts=False, axis=0)
-   
     print('Saving...')
     with open(os.path.join(args.output, 'code.pkl'), "wb") as tf:
         pickle.dump(code, tf)

@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 EXTRA_PAD = 1
 MAX_TOKEN = 5000
-
+NUM_TRHEADS = 36
 
 class SE(torch.utils.data.Dataset):
     """ sketch-extrude dataset """
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     with tqdm(dataloader, unit="batch") as batch_data:
         for pixel_v_flat, pixel_v_mask, uids in batch_data:
             iter_data = zip(pixel_v_flat.detach().cpu().numpy(), uids)
-            load_iter = Pool(36).imap(raster, iter_data)  # number of threads in your pc
+            load_iter = Pool(NUM_TRHEADS).imap(raster, iter_data)  # number of threads in your pc
             for valid, data_uid, _ in load_iter:
                 if not valid:
                     invalid_uids.append(data_uid)

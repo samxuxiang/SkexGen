@@ -28,6 +28,8 @@ def timeout(time):
 def raise_timeout(signum, frame):
     raise TimeoutError
 
+NUM_TRHEADS = 36
+NUM_FOLDERS = 100
 
 def load_json_data(pathname):
     """Load data from a json file"""
@@ -67,7 +69,7 @@ if __name__ == "__main__":
     skexgen_obj = []
     data_folder = Path(args.data_folder)
     
-    for i in range(100): # all 100 folders
+    for i in range(NUM_FOLDERS): 
         cur_in = data_folder / str(i).zfill(4)
         cur_out = output_folder / str(i).zfill(4)
         if not cur_out.exists():
@@ -84,8 +86,7 @@ if __name__ == "__main__":
         skexgen_obj,
     )
    
-    threads = 36  # number of threads in your PC
-    convert_iter = Pool(threads).imap(convert_folder_parallel, iter_data) 
+    convert_iter = Pool(NUM_TRHEADS).imap(convert_folder_parallel, iter_data) 
     for invalid in tqdm(convert_iter, total=len(deepcad_json)):
         ### Surpress Warnings ###
         # if invalid is not None:

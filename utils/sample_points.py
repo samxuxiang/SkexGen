@@ -10,6 +10,7 @@ from trimesh.sample import sample_surface
 from plyfile import PlyData, PlyElement
 import numpy as np
 
+NUM_TRHEADS = 36 
 
 def write_ply(points, filename, text=False):
     """ input: Nx3, write points to filename as PLY format. """
@@ -73,7 +74,7 @@ class SamplePoints:
         Run simplification.
         """
         project_folders = sorted(glob(self.options.in_dir+'/*/'))
-        convert_iter = Pool(36).imap(self.run_parallel, project_folders) 
+        convert_iter = Pool(NUM_TRHEADS).imap(self.run_parallel, project_folders) 
         for _ in tqdm(convert_iter, total=len(project_folders)):
             pass
        

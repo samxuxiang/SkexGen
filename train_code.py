@@ -25,9 +25,9 @@ def train(args):
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 
-            'num_layers': 4,
+            'num_layers': 8,
             'num_heads': 8,
-            'dropout_rate': 0.0
+            'dropout_rate': 0.1
         },
         max_len=args.seqlen,
         classes=args.code,
@@ -45,7 +45,7 @@ def train(args):
     iters = 0
     print('Start training...')
 
-    for epoch in range(1000):
+    for epoch in range(800): 
         print(epoch)
 
         for batch in dataloader:
