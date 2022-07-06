@@ -2,8 +2,7 @@ import os
 import torch
 import argparse
 from multiprocessing import Pool
-from dataset import SketchExtData
-from model.ar import ARModel
+from model.code import CodeModel
 from model.decoder import SketchDecoder, EXTDecoder
 from model.encoder import PARAMEncoder, CMDEncoder, EXTEncoder
 from utils import CADparser, write_obj
@@ -14,8 +13,6 @@ def sample(args):
     # Initialize gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
     device = torch.device("cuda:0")
-
-    dataset = SketchExtData(args.data, args.invalid, args.maxlen)
   
     cmd_encoder = CMDEncoder(
         config={
@@ -25,11 +22,11 @@ def sample(args):
             'num_heads': 8,
             'dropout_rate': 0.1
         },
-        max_len=dataset.maxlen_pix,
+        max_len=200,
         code_len = 4,
         num_code = 500,
     )
-    cmd_encoder.load_state_dict(torch.load(os.path.join(args.weight, 'cmdenc_epoch_'+str(args.epoch)+'.pt')))
+    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_300.pt')))
     cmd_encoder = cmd_encoder.to(device).eval()
 
     param_encoder = PARAMEncoder(
@@ -41,11 +38,11 @@ def sample(args):
             'dropout_rate': 0.1
         },
         quantization_bits=args.bit,
-        max_len=dataset.maxlen_pix,
+        max_len=200,
         code_len = 2,
         num_code = 1000,
     )
-    param_encoder.load_state_dict(torch.load(os.path.join(args.weight, 'paramenc_epoch_'+str(args.epoch)+'.pt')))
+    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_300.pt')))
     param_encoder = param_encoder.to(device).eval()
 
     sketch_decoder = SketchDecoder(
@@ -56,11 +53,11 @@ def sample(args):
             'num_heads': 8,
             'dropout_rate': 0.1  
         },
-        pix_len=dataset.maxlen_pix,
-        cmd_len=dataset.maxlen_cmd,
+        pix_len=200,
+        cmd_len=124,
         quantization_bits=args.bit,
     )
-    sketch_decoder.load_state_dict(torch.load(os.path.join(args.weight, 'sketchdec_epoch_'+str(args.epoch)+'.pt')))
+    sketch_decoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'sketchdec_epoch_300.pt')))
     sketch_decoder = sketch_decoder.to(device).eval()
     
     ext_encoder = EXTEncoder(
@@ -71,8 +68,8 @@ def sample(args):
             'num_heads': 8,
             'dropout_rate': 0.1
         },
-        quantization_bits=6,
-        max_len=dataset.maxlen_ext,
+        quantization_bits=args.bit,
+        max_len=96,
         code_len = 4,
         num_code = 1000,
     )
@@ -87,13 +84,13 @@ def sample(args):
             'num_heads': 8,
             'dropout_rate': 0.1  
         },
-        max_len=dataset.maxlen_ext,
+        max_len=96,
         quantization_bits=args.bit,
     )
     ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_200.pt')))
     ext_decoder = ext_decoder.to(device).eval()
 
-    ar_model = ARModel(
+    code_model = CodeModel(
         config={
             'hidden_dim': 512,
             'embed_dim': 256, 
@@ -104,15 +101,14 @@ def sample(args):
         max_len=10,
         classes=1000,
     )
-    ar_model.load_state_dict(torch.load(os.path.join(args.output, 'ar_epoch_1000.pt')))
-    ar_model = ar_model.to(device).eval()
+    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1000.pt')))
+    code_model = code_model.to(device).eval()
 
     print('Random Generation...')
-    if not os.path.exists(args.output, 'samples'):
+    if not os.path.exists(args.output):
         os.makedirs(args.output)
     
     NUM_SAMPLE = 20000
-    count = 0
     cad = []
     BS = 1024
     cmd_codebook = cmd_encoder.vq_vae._embedding
@@ -120,10 +116,8 @@ def sample(args):
     ext_codebook = ext_encoder.vq_vae._embedding
   
     while len(cad) < NUM_SAMPLE:
-        count += BS
-
         with torch.no_grad():
-            codes = ar_model.sample(n_samples=BS)
+            codes = code_model.sample(n_samples=BS)
             cmd_code = codes[:,:4] 
             param_code = codes[:,4:6] 
             ext_code = codes[:,6:] 

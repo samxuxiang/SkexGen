@@ -82,7 +82,7 @@ Extract codes:
   ```
     python extract_code.py --sketch_weight proj_log/exp_sketch \
                            --ext_weight proj_log/exp_extrude \
-                           --epoch 1 --device 0 --maxlen 200 --bit 6 \
+                           --device 0 --maxlen 200 --bit 6 \
                            --output proj_log/exp_code \
                            --data data/cad_data/train_deduplicate_s.pkl \
                            --invalid data/cad_data/train_invalid.pkl 
@@ -95,21 +95,21 @@ Train code selector (random generation):
                          --batchsize 512 --device 0 \
                          --code 1000 --seqlen 10
   ```
-  `seqlen`: 4 topology, 2 geometry, 4 extrude 
+  `seqlen`: 4 topology, 2 geometry, 4 extrude, 
   `code`: max size of codebook is 1000
 
-Download pretrained SkexGen model from [here]()
+Download our pretrained SkexGen model [here]()
 
 
 ## Testing and Evaluation
 Randomly sample the codes and decode to sketch-and-extrude: 
   ```
-    python sample.py --weight proj_log/your/exp \
-                        --epoch 300 --device 0 --maxlen 250 --bit 6 \
-                        --output proj_log/your/exp/samples \
-                        --data path/to/cad_network/train_unique_s.pkl \
-                        --invalid path/to/cad_network/train_invalid_s.pkl 
-  ```
+    python sample.py --sketch_weight proj_log/exp_sketch \
+                     --ext_weight proj_log/exp_ext \
+                     --code_weight proj_log/exp_code \
+                     --device 0 --bit 6 \
+                     --output proj_log/samples 
+  ```                   
 
 Evaluate the results by COV, MMD and JSD:
 ```bash

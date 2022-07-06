@@ -30,7 +30,7 @@ def extract(args):
         code_len = 4,
         num_code = 500,
     )
-    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_'+str(args.epoch)+'.pt')))
+    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_300.pt')))
     cmd_encoder = cmd_encoder.to(device).eval()
 
     param_encoder = PARAMEncoder(
@@ -46,7 +46,7 @@ def extract(args):
         code_len = 2,
         num_code = 1000,
     )
-    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_'+str(args.epoch)+'.pt')))
+    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_300.pt')))
     param_encoder = param_encoder.to(device).eval()
 
     ext_encoder = EXTEncoder(
@@ -62,7 +62,7 @@ def extract(args):
         code_len = 4,
         num_code = 1000,
     )
-    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_1.pt')))
+    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_200.pt')))
     ext_encoder = ext_encoder.to(device).eval()
 
     print('Extracting Code...')
@@ -102,7 +102,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--sketch_weight", type=str, required=True)
     parser.add_argument("--ext_weight", type=str, required=True)
-    parser.add_argument("--epoch", type=int, required=True)
     parser.add_argument("--device", type=int, required=True)
     parser.add_argument("--maxlen", type=int, required=True)
     parser.add_argument("--data", type=str, required=True)
