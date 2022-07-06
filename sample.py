@@ -29,7 +29,7 @@ def sample(args):
         code_len = 4,
         num_code = 500,
     )
-    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_1.pt')))
+    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_300.pt')))
     cmd_encoder = cmd_encoder.to(device).eval()
 
     param_encoder = PARAMEncoder(
@@ -45,7 +45,7 @@ def sample(args):
         code_len = 2,
         num_code = 1000,
     )
-    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_1.pt')))
+    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_300.pt')))
     param_encoder = param_encoder.to(device).eval()
 
     sketch_decoder = SketchDecoder(
@@ -60,7 +60,7 @@ def sample(args):
         cmd_len=124,
         quantization_bits=args.bit,
     )
-    sketch_decoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'sketchdec_epoch_1.pt')))
+    sketch_decoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'sketchdec_epoch_300.pt')))
     sketch_decoder = sketch_decoder.to(device).eval()
     
     ext_encoder = EXTEncoder(
@@ -76,7 +76,7 @@ def sample(args):
         code_len = 4,
         num_code = 1000,
     )
-    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_1.pt')))
+    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_200.pt')))
     ext_encoder = ext_encoder.to(device).eval()
 
     ext_decoder = EXTDecoder(
@@ -90,7 +90,7 @@ def sample(args):
         max_len=96,
         quantization_bits=args.bit,
     )
-    ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_1.pt')))
+    ext_decoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extdec_epoch_200.pt')))
     ext_decoder = ext_decoder.to(device).eval()
 
     code_model = CodeModel(
@@ -104,7 +104,7 @@ def sample(args):
         max_len=10,
         classes=1000,
     )
-    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1.pt')))
+    code_model.load_state_dict(torch.load(os.path.join(args.code_weight, 'code_epoch_1000.pt')))
     code_model = code_model.to(device).eval()
 
     print('Random Generation...')

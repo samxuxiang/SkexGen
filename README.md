@@ -29,7 +29,7 @@ Note: only tested on CUDA 11.4.
 ## Data
 
 ### Preprocess
-Download original DeepCAD json [here](https://github.com/ChrisWu1997/DeepCAD) ([Google Drive](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG)) and put it under `data` folder.
+Download the [raw json](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG) from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD). Unzip it under the data folder.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
@@ -54,7 +54,7 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
-Download our pre-processed SkexGen data [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+Download SkexGen [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
 
 
 
@@ -98,33 +98,41 @@ Train code selector (random generation):
   `seqlen`: 4 topology, 2 geometry, 4 extrude, 
   `code`: max size of codebook is 1000
 
-Download our pretrained SkexGen model [here]()
+Download SkexGen [pretrained model]()
 
 
-## Testing and Evaluation
-Randomly sample the codes and decode to sketch-and-extrude: 
-  ```
-    python sample.py --sketch_weight proj_log/exp_sketch \
-                     --ext_weight proj_log/exp_extrude \
-                     --code_weight proj_log/exp_code \
-                     --device 0 --bit 6 \
-                     --output proj_log/samples 
-  ```                   
+## Evaluation
+Random generation: 
+```bash
+# sample the codes and decode it to sketch and extrude sequence
+  python sample.py --sketch_weight proj_log/exp_sketch \
+                      --ext_weight proj_log/exp_extrude \
+                      --code_weight proj_log/exp_code \
+                      --device 0 --bit 6 \
+                      --output proj_log/samples 
+
+# Under utils folder:
+
+# convert generated sketch-and-extrude to stl format
+  python visual_obj.py --data_folder proj_log/samples 
+
+# render and visualize 
+python cad_img.py  --input_dir proj_log/samples --output_dir proj_log/samples_visual
+```
+                
 
 Evaluate the results by COV, MMD and JSD:
 ```bash
-# (under utils folder)
-# convert generated sketch-and-extrude to stl 
-  python visual_obj.py --data_folder proj_log/your/exp/samples
+# Under utils folder:
 
 # uniformly sample 2000 points on the CAD model
-  python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
+  python sample_points.py --in_dir proj_log/samples --out_dir pcd
 
 # evaluate generation performance 
-  python eval_cad.py --fake proj_log/your/exp/samples \
-                     --real path/to/cad_network/test_obj
+  python eval_cad.py --fake proj_log/samples \
+                     --real data/test_eval
 ```
-
+Download [test_eval](https://drive.google.com/file/d/1PiVDm6pLGsz4Y_GZZ-J_ODqOGaAOKy9U/view?usp=sharing) and unzip it under the data folder. This contains the sampled point clouds from test set. You need it for evaluation 
 
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):

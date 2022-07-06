@@ -97,6 +97,6 @@ if __name__ == "__main__":
     solids = []
     cad_folders = sorted(glob(args.data_folder+'/*/'))
 
-    convert_iter = Pool(36).imap(run_parallel, cad_folders)
+    convert_iter = Pool(36).imap(run_parallel, cad_folders) # number of threads in your pc
     for solid in tqdm(convert_iter, total=len(cad_folders)):
         pass
