@@ -53,7 +53,7 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
-Download the already [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+You can download the already [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
 
 
 
@@ -97,7 +97,7 @@ Train code selector (random generation):
   `seqlen`: 4 topology, 2 geometry, 4 extrude, 
   `code`: max size of codebook is 1000
 
-Download the [pretrained models](https://drive.google.com/file/d/1K4zxfoL7W9Q--d8wVv4spCf4ARVNKxqK/view?usp=sharing)
+Download our [pretrained models](https://drive.google.com/file/d/1K4zxfoL7W9Q--d8wVv4spCf4ARVNKxqK/view?usp=sharing)
 
 
 ## Evaluation
