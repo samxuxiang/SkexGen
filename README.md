@@ -54,27 +54,28 @@ Follow these steps to convert DeepCAD data to SkexGen format:
   python invalid.py --datapath ../data/cad_data --bit 6
 ```
 
-Download pre-processed SkexGen data [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+Download our pre-processed SkexGen data [here](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
 
 
 
 ## Training
 
-To train the sketch module (topology encoder, geometry encoder, sketch decoder):
+Train the sketch module (topology encoder, geometry encoder, sketch decoder):
   ```
-    python train_sketch.py --data path/to/cad_network/train_unique_s.pkl \
-                      --output proj_log/your/exp \
-                      --bit 6 --maxlen 200 --batchsize 128 --device 0
+    python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
+                           --output proj_log/exp_sketch \
+                           --invalid data/cad_data/train_invalid.pkl \
+                           --bit 6 --maxlen 200 --batchsize 128 --device 0
   ```
-  `maxlen`: sketch sequence length
+  `maxlen`: sketch sequence length (default 200)
 
-To train the extrude module (extrude encoder, extrude decoder):
+Train the extrude module (extrude encoder, extrude decoder):
   ```
-    python train_extrude.py --data path/to/cad_network/train_unique_e.pkl \
-                      --output proj_log/your/exp \
+    python train_extrude.py --data data/cad_data/train_deduplicate_e.pkl \
+                      --output proj_log/exp_extrude \
                       --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
-  `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
+  `maxlen`: number of extudes (default 5)
 
 
 Extract training dataset codes:
@@ -86,7 +87,7 @@ Extract training dataset codes:
                            --invalid path/to/cad_network/train_invalid_s.pkl 
   ```
 
-To train the code selector: 
+Train the code selector: 
   ```
     python train_code.py --input proj_log/your/exp/codes/train_code.pkl \
                        --output proj_log/your/exp \

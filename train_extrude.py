@@ -7,18 +7,19 @@ from dataset import ExtData
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.tensorboard import SummaryWriter
-from utils import get_constant_schedule_with_warmup
 from tqdm import tqdm
 
-
+import sys
+sys.path.insert(0, 'utils')
+from utils import get_constant_schedule_with_warmup
 
 def train(args):
-    # Initialize gpu device
+    # gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     device = torch.device("cuda:0")
     
     # Initialize dataset loader
-    dataset = ExtData(args.data, args.invalid, args.maxlen)
+    dataset = ExtData(args.data, args.maxlen)
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
@@ -102,6 +103,9 @@ def train(args):
                 scheduler.step()  # linear warm up to 1e-3
                 iters += 1
 
+        torch.save(ext_encoder.state_dict(), os.path.join(args.output,'extenc_epoch_'+str(epoch+1)+'.pt'))
+        torch.save(ext_decoder.state_dict(), os.path.join(args.output,'extdec_epoch_'+str(epoch+1)+'.pt'))
+
         writer.flush()
         # save model after n epoch
         if (epoch+1) % 100 == 0:
@@ -114,12 +118,11 @@ def train(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, required=True)
-    parser.add_argument("--output", type=str, help="Output folder to save the data [default: output]")
-    parser.add_argument("--batchsize", type=int, help="Training Batch Size")
-    parser.add_argument("--device", type=str, help="CUDA Device Index")
-    parser.add_argument("--bit", type=int, help="quantization bit")
-    parser.add_argument("--maxlen", type=int, help="maximum token length")
-    parser.add_argument("--invalid", type=str, required=True)
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--batchsize", type=int, required=True)
+    parser.add_argument("--device", type=str, required=True)
+    parser.add_argument("--bit", type=int, required=True)
+    parser.add_argument("--maxlen", type=int, required=True)
     args = parser.parse_args()
 
     # Create training folder

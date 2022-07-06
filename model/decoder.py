@@ -106,7 +106,7 @@ class SketchDecoder(nn.Module):
     self.decoder = TransformerDecoder(decoder_layers, config['num_layers'], decoder_norm)
 
 
-  def forward(self, pixel_v, xy_v, pixel_mask, latent_z, is_training=True):
+  def forward(self, pixel_v, xy_v, pixel_mask, latent_z):
     """ forward pass """
     if pixel_v[0] is None:
       c_bs = len(pixel_v)
@@ -122,13 +122,6 @@ class SketchDecoder(nn.Module):
       coord_embed = self.coord_embed_x(xy_v[...,0]) + self.coord_embed_y(xy_v[...,1]) # [bs, vlen, dim]
       pixel_embed = self.pixel_embed(pixel_v)
       embed_inputs = pixel_embed + coord_embed
-      
-      #### REMOVED ####
-      # if is_training:  
-      #   # dropout (optional)
-      #   drop_index = np.random.uniform(low=0.0, high=1.0, size=(embed_inputs.shape[0], embed_inputs.shape[1])) < DROP_RATE
-      #   embed_inputs[drop_index, :] = 0.0
-
       embeddings = torch.cat([context_embedding, embed_inputs.transpose(0,1)], axis=0)
       decoder_inputs = self.pos_embed(embeddings) 
 
@@ -178,7 +171,7 @@ class SketchDecoder(nn.Module):
       
       # pass through model
       with torch.no_grad():
-        p_pred = self.forward(pixel_seq, xy_seq, None, latent_z, is_training=False)
+        p_pred = self.forward(pixel_seq, xy_seq, None, latent_z)
         p_logits = p_pred[:, -1, :]
 
       next_pixels = []
@@ -268,7 +261,7 @@ class EXTDecoder(nn.Module):
     self.decoder = TransformerDecoder(decoder_layers, config['num_layers'], decoder_norm)
       
 
-  def forward(self, ext_v, flags, ext_mask, code=None, is_training=True):
+  def forward(self, ext_v, flags, ext_mask, code=None):
     """ forward pass """
     if ext_v[0] is None:
       c_bs = len(ext_v)
@@ -322,7 +315,7 @@ class EXTDecoder(nn.Module):
 
       # pass through model
       with torch.no_grad():
-        p_pred = self.forward(pixel_seq, flag_seq, None, latent_z, is_training=False)
+        p_pred = self.forward(pixel_seq, flag_seq, None, latent_z)
         p_logits = p_pred[:, -1, :]
 
       next_pixels = []

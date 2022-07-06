@@ -259,17 +259,11 @@ class SketchExtData(torch.utils.data.Dataset):
 
 class ExtData(torch.utils.data.Dataset):
     """ extrude dataset """
-    def __init__(self, data_path, invalid, MAX_LEN):
+    def __init__(self, data_path, MAX_LEN):
         with open(data_path, 'rb') as f:
             data = pickle.load(f)
         self.maxlen = MAX_LEN 
         self.maxlen_ext = 0 
-
-        with open(invalid, 'rb') as f:
-            invalid_uids = pickle.load(f)
-        invaliduid = {}
-        for invalid in invalid_uids:
-            invaliduid[invalid] = True
 
         # Filter out too long results
         self.data = []
@@ -277,7 +271,7 @@ class ExtData(torch.utils.data.Dataset):
             vec_data = data[index]
             uid = vec_data['name']
 
-            if vec_data['num_se'] <= self.maxlen:  # and uid not in invaliduid:
+            if vec_data['num_se'] <= self.maxlen: 
                 self.data.append(vec_data)
                 ext_len = vec_data['len_ext']
                 if ext_len+EXTRA_PAD > self.maxlen_ext:

@@ -7,11 +7,14 @@ import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
 from model.encoder import PARAMEncoder, CMDEncoder
 from model.decoder import SketchDecoder
-from utils import get_constant_schedule_with_warmup
 from tqdm import tqdm
 
+import sys
+sys.path.insert(0, 'utils')
+from utils import get_constant_schedule_with_warmup
+
 def train(args):
-    # Initialize gpu device
+    # gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     device = torch.device("cuda:0")
     
@@ -20,7 +23,7 @@ def train(args):
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
-                                             num_workers=8,
+                                             num_workers=5,
                                              pin_memory=True)
     # Initialize models
     cmd_encoder = CMDEncoder(
@@ -97,7 +100,7 @@ def train(args):
                 latent_z = torch.cat((latent_cmd, latent_param), 1)
             
                 # Pass through decoder
-                pix_pred = sketch_decoder(pix[:, :-1], xy[:, :-1, :], mask[:, :-1], latent_z, is_training=True)
+                pix_pred = sketch_decoder(pix[:, :-1], xy[:, :-1, :], mask[:, :-1], latent_z)
                 pix_mask = ~mask.reshape(-1)
                 pix_logit = pix_pred.reshape(-1, pix_pred.shape[-1]) 
                 pix_target = pix.reshape(-1)
@@ -140,11 +143,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, required=True)
     parser.add_argument("--invalid", type=str, required=True)
-    parser.add_argument("--output", type=str, help="Output folder", required=True)
-    parser.add_argument("--batchsize", type=int, help="Training Batch Size", required=True)
-    parser.add_argument("--device", type=str, help="CUDA Device Index", required=True)
-    parser.add_argument("--bit", type=int, help="quantization bit", required=True)
-    parser.add_argument("--maxlen", type=int, help="maximum token length", required=True)
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--batchsize", type=int, required=True)
+    parser.add_argument("--device", type=str, required=True)
+    parser.add_argument("--bit", type=int, required=True)
+    parser.add_argument("--maxlen", type=int, required=True)
     args = parser.parse_args()
 
     # Create training folder
