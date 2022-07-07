@@ -120,20 +120,25 @@ if __name__ == "__main__":
                 files.append(f)
         deepcad_json += files
         skexgen_obj += [cur_out]*len(files)
-        
-    assert len(skexgen_obj) == len(deepcad_json), "JSON & OBJ length different"
 
-    # Parallel convert to JSON & STL
-    iter_data = zip(
-        deepcad_json,
-        skexgen_obj,
-    )
-   
-    convert_iter = Pool(NUM_TRHEADS).imap(convert_folder_parallel, iter_data) 
-    for invalid in tqdm(convert_iter, total=len(deepcad_json)):
-        if invalid is not None:
-            if args.verbose:
-                print(f'Error converting {invalid}...')
+    num_files_still_to_process = len(deepcad_json)
+        
+    assert len(skexgen_obj) == num_files_still_to_process, "JSON & OBJ length different"
+
+    print(f"Found {len(deepcad_json)} files which require processing")
+    
+    if num_files_still_to_process > 0:
+        # Parallel convert to JSON & STL
+        iter_data = zip(
+            deepcad_json,
+            skexgen_obj,
+        )
+    
+        convert_iter = Pool(NUM_TRHEADS).imap(convert_folder_parallel, iter_data) 
+        for invalid in tqdm(convert_iter, total=len(deepcad_json)):
+            if invalid is not None:
+                if args.verbose:
+                    print(f'Error converting {invalid}...')
     
     
 
