@@ -10,6 +10,7 @@ from trimesh.sample import sample_surface
 from plyfile import PlyData, PlyElement
 import numpy as np
 
+NUM_TRHEADS = 36 
 
 def write_ply(points, filename, text=False):
     """ input: Nx3, write points to filename as PLY format. """
@@ -56,11 +57,11 @@ class SamplePoints:
         files = find_files(project_folder, 'final.stl')
         
         for filepath in files:
-            N_POINTS = 8096
+            N_POINTS = 2000
             try:
                 out_mesh = trimesh.load(str(filepath))
                 out_pc, _ = sample_surface(out_mesh, N_POINTS)
-                save_path = os.path.join(out_folder, ntpath.basename(filepath)[:-4]+'_8096pcd.ply')
+                save_path = os.path.join(out_folder, ntpath.basename(filepath)[:-4]+'_pcd.ply')
                 write_ply(out_pc, save_path)
 
             except Exception as ex:        
@@ -73,7 +74,7 @@ class SamplePoints:
         Run simplification.
         """
         project_folders = sorted(glob(self.options.in_dir+'/*/'))
-        convert_iter = Pool(36).imap(self.run_parallel, project_folders) 
+        convert_iter = Pool(NUM_TRHEADS).imap(self.run_parallel, project_folders) 
         for _ in tqdm(convert_iter, total=len(project_folders)):
             pass
        

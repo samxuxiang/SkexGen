@@ -16,8 +16,8 @@ def extract(args):
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=False, 
                                              batch_size=1024,
-                                             num_workers=8)
-
+                                             num_workers=5)
+    # Load pretrained models
     cmd_encoder = CMDEncoder(
         config={
             'hidden_dim': 512,
@@ -30,7 +30,7 @@ def extract(args):
         code_len = 4,
         num_code = 500,
     )
-    cmd_encoder.load_state_dict(torch.load(os.path.join(args.weight, 'cmdenc_epoch_'+str(args.epoch)+'.pt')))
+    cmd_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'cmdenc_epoch_300.pt')))
     cmd_encoder = cmd_encoder.to(device).eval()
 
     param_encoder = PARAMEncoder(
@@ -46,7 +46,7 @@ def extract(args):
         code_len = 2,
         num_code = 1000,
     )
-    param_encoder.load_state_dict(torch.load(os.path.join(args.weight, 'paramenc_epoch_'+str(args.epoch)+'.pt')))
+    param_encoder.load_state_dict(torch.load(os.path.join(args.sketch_weight, 'paramenc_epoch_300.pt')))
     param_encoder = param_encoder.to(device).eval()
 
     ext_encoder = EXTEncoder(
@@ -62,7 +62,7 @@ def extract(args):
         code_len = 4,
         num_code = 1000,
     )
-    ext_encoder.load_state_dict(torch.load('proj_log/6bit_4x1000_ip_nodrop_128codedim_maxlen10_flag/extenc_epoch_500.pt'))
+    ext_encoder.load_state_dict(torch.load(os.path.join(args.ext_weight, 'extenc_epoch_200.pt')))
     ext_encoder = ext_encoder.to(device).eval()
 
     print('Extracting Code...')
@@ -89,30 +89,23 @@ def extract(args):
             codes = np.concatenate((cmd_code, param_code, ext_code), 1)
             total_z.append(codes)
 
-    train_code = np.vstack(total_z)
-    train_code_unique, counts = np.unique(np.vstack(total_z), return_counts=True, axis=0)
-    print(train_code_unique.shape[0])
-   
+    code = np.unique(np.vstack(total_z), return_counts=False, axis=0)
     print('Saving...')
-    # Save to file 
-    with open(os.path.join(args.output, 'train_code.pkl'), "wb") as tf:
-        pickle.dump(train_code, tf)
-
-    with open(os.path.join(args.output, 'train_code_unique.pkl'), "wb") as tf:
-        pickle.dump(train_code_unique, tf)
+    with open(os.path.join(args.output, 'code.pkl'), "wb") as tf:
+        pickle.dump(code, tf)
 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=str, required=True, help="Ouput folder containing the sampled results")
-    parser.add_argument("--weight", type=str, required=True, help="Input folder containing the saved model")
-    parser.add_argument("--epoch", type=int, required=True, help="weight epoch")
-    parser.add_argument("--device", type=int, help="CUDA Device Index")
-    parser.add_argument("--maxlen", type=int, help="maximum token length")
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--sketch_weight", type=str, required=True)
+    parser.add_argument("--ext_weight", type=str, required=True)
+    parser.add_argument("--device", type=int, required=True)
+    parser.add_argument("--maxlen", type=int, required=True)
     parser.add_argument("--data", type=str, required=True)
     parser.add_argument("--invalid", type=str, required=True)
-    parser.add_argument("--bit", type=int, help="quantization bit")
+    parser.add_argument("--bit", type=int, required=True)
     args = parser.parse_args()
 
     extract(args)

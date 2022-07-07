@@ -1,20 +1,20 @@
-# SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
+## SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks
 
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
 **ICML 2022**  
-[website](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [video]()
+[project](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [youtube]() | [bilibili]()
 
 
 ## Installation
 
 ### Environment
-* **Tested OS:** Linux
+* Linux
 * Python >= 3.8
-* PyTorch >= 1.10.1
+* PyTorch >= 1.10
 
 ### Dependencies
-* Install [PyTorch 1.10.1](https://pytorch.org/get-started/previous-versions/) with the correct CUDA version.
+* Install [PyTorch 1.10](https://pytorch.org/get-started/previous-versions/) with the correct CUDA version.
 * Install other dependencies:
     ```
     pip install -r requirements.txt
@@ -23,21 +23,19 @@ Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Ja
 
 ### Docker
 We also provide the docker image for running SkexGen. You can download it from [dockerhub](https://hub.docker.com/r/samxuxiang/skexgen) (~10GB). \
-Note this is only tested on CUDA 11.4 and up. 
+Note: only tested on CUDA 11.4. 
 
  
 ## Data
 
-### Preprocess
-Download original DeepCAD json from [here](https://github.com/ChrisWu1997/DeepCAD).
+Download the [raw json data](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG) from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD). Unzip it under the data folder.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
-# convert json to obj format and also save its stl (under `occ_utils` folder)
-  python convert.py --data_folder path/to/cad_json --output_folder path/to/cad_obj
-
-# normalize CAD (under `occ_utils` folder)
-  python normalize.py --data_folder path/to/cad_obj --out_folder path/to/cad_norm
+# Under utils folder:
+-----------------------------------Old--------------------------
+# parse DeepCAD json to a simple obj format 
+  python convert.py --data_folder ../data/cad_json --output_folder ../data/cad_obj
 
 # parse obj to network-friendly sequence and save as pickle (under `data_utils` folder)
   python parse.py \
@@ -65,98 +63,116 @@ Follow these steps to convert DeepCAD data to SkexGen format:
 
 When running `convert.py` some files in the DeepCAD dataset fail to generate valid solid models.  You may use the the `--verbose` option to see additional details about the problem files.   If the `convert.py` script hangs during processing it can be safely restarted and will continue from where it left off.
 
-### Pretrained Models
-SkexGen trained under different settings 
 
-| **Sketch MaxLen** | **Extrude MaxLen** | **Code Config (T-G-E)** | **Download** |
-|--------------------|-----------|----------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 200              | 4       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 200              | 8       | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 200              | 10      | 4x500-2x1000-4x1000    | [checkpoint]() | 
-| 250              | 4       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1CdwRKaLILBKg9VfevsEaozjF2UtOA5PC?usp=sharing) | 
-| 250              | 8       | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1bNl8OxkiFrCAez3yklxePPzT_BH4Akzb?usp=sharing) | 
-| 250              | 10      | 4x500-2x1000-4x1000    | [checkpoint](https://drive.google.com/drive/folders/1Y5wrb7qKk1igJNpEUILES8MRdeS68kH5?usp=sharing) | 
+
+```
+-----------------------------------New--------------------------
+# normalize CAD and update the obj file
+  python normalize.py --data_folder ../data/cad_obj --out_folder ../data/cad_norm
+
+# parse obj to primitive sequence 
+  python parse.py --input ../data/cad_norm --output ../data/cad_data --bit 6
+
+# remove duplicated sketch data
+  python deduplicate.py --datapath ../data/cad_data --hash_type s
+
+# remove duplicated extrude data
+  python deduplicate.py --datapath ../data/cad_data --hash_type e
+
+# Find all the invalid CAD models
+  python invalid.py --datapath ../data/cad_data --bit 6
+```
+
+You can download the already [pre-processed data](https://drive.google.com/file/d/1so_CCGLIhqGEDQxMoiR--A4CQk4MjuOp/view?usp=sharing)
+
+
 
 ## Training
 
-### SkexGen Encoder - Decoder
-To train the sketch module (topology encoder, geometry encoder, sketch decoder):
+Train sketch branch (topology encoder, geometry encoder, sketch decoder):
   ```
-    python train_s.py --data path/to/cad_network/train_unique_s.pkl \
-                      --output proj_log/your/exp \
-                      --invalid path/to/cad_network/train_invalid_s.pkl \
-                      --bit 6 --maxlen 250 --batchsize 256 --device '0' 
+    python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
+                           --output proj_log/exp_sketch \
+                           --invalid data/cad_data/train_invalid.pkl \
+                           --bit 6 --maxlen 200 --batchsize 128 --device 0
   ```
-  `maxlen`: sketch sequence length
+  `maxlen`: sketch sequence length (default 200)
 
-To train the extrude module (extrude encoder, extrude decoder):
+Train extrude branch (extrude encoder, extrude decoder):
   ```
-    python train_e.py --data path/to/cad_network/train_unique_e.pkl \
-                      --output proj_log/your/exp \
-                      --bit 6 --maxlen 8 --batchsize 256 --device '0'
+    python train_extrude.py --data data/cad_data/train_deduplicate_e.pkl \
+                            --output proj_log/exp_extrude \
+                            --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
-  `maxlen`: number of extudes, extrude sequence length is `maxlen` x 20
+  `maxlen`: number of extudes (default 5)
 
-### Code Selector
-Extract training dataset codes:
+
+Extract codes:
   ```
-    python extract_code.py --weight proj_log/your/exp \
-                           --epoch 300 --device 0 --maxlen 250 --bit 6 \
-                           --output proj_log/your/exp/codes \
-                           --data path/to/cad_network/train_unique_s.pkl \
-                           --invalid path/to/cad_network/train_invalid_s.pkl 
+    python extract_code.py --sketch_weight proj_log/exp_sketch \
+                           --ext_weight proj_log/exp_extrude \
+                           --device 0 --maxlen 200 --bit 6 \
+                           --output proj_log/exp_code \
+                           --data data/cad_data/train.pkl \
+                           --invalid data/cad_data/train_invalid.pkl 
   ```
 
-Train code Transformer: 
+Train code selector (random generation): 
   ```
-    python train_ar.py --input proj_log/your/exp/codes/train_code.pkl \
-                       --output proj_log/your/exp \
-                       --batchsize 512 --device '0' \
-                       --code 1000 --seqlen 10
+    python train_code.py --input proj_log/exp_code/code.pkl \
+                         --output proj_log/exp_code \
+                         --batchsize 512 --device 0 \
+                         --code 1000 --seqlen 10
   ```
-  `seqlen`: 4 topology codes, 2 geometry codes, 4 extrude codes 
+  `seqlen`: 4 topology, 2 geometry, 4 extrude, 
   `code`: max size of codebook is 1000
 
+Download our [pretrained models](https://drive.google.com/file/d/1K4zxfoL7W9Q--d8wVv4spCf4ARVNKxqK/view?usp=sharing)
 
 
-## Testing and Evaluation
-Randomly sample the codes and decode to sketch-and-extrude: 
-  ```
-    python sample_ar.py --weight proj_log/your/exp \
-                        --epoch 300 --device 0 --maxlen 250 --bit 6 \
-                        --output proj_log/your/exp/samples \
-                        --data path/to/cad_network/train_unique_s.pkl \
-                        --invalid path/to/cad_network/train_invalid_s.pkl 
-  ```
-
-To evaluate the results by COV, MMD and JSD:
+## Evaluation
+Random generation: 
 ```bash
-# convert generated sketch-and-extrude to stl (under occ_utils folder)
-  python visual_obj.py --data_folder proj_log/your/exp/samples
-
-# uniformly sample 2000 points on the CAD model (under occ_utils folder)
-  python sample_points.py --in_dir proj_log/your/exp/samples --out_dir pcd
-
-# evaluate generation performance (under eval folder)
-  python eval_cad.py --fake proj_log/your/exp/samples \
-                     --real path/to/cad_network/test_obj
+# sample the codes and autoregressively decode it to sketch and extrude
+  python sample.py --sketch_weight proj_log/exp_sketch \
+                      --ext_weight proj_log/exp_extrude \
+                      --code_weight proj_log/exp_code \
+                      --device 1 --bit 6 \
+                      --output proj_log/samples 
 ```
 
+Visualization: 
+```bash
+# Under utils folder:
 
-To evaluate the results by Unique and Novel percentage:
-  ```
-    python eval_duplicate.py --gen_path proj_log/your/exp/samples/objs.pkl \
-                            --gt_path path/to/cad_network/train_unique_s.pkl
-  ```
+# convert generated sketch-and-extrude to stl format (timeout prevent occ hanging)
+  timeout 180 python visual_obj.py --data_folder ../proj_log/samples 
+
+# render and visualize to images 
+  python cad_img.py  --input_dir ../proj_log/samples --output_dir ../proj_log/samples_visual
+```
+                
+
+Evaluate the CAD models (after running `visual_obj.py`):
+```bash
+# Under utils folder:
+
+# uniformly sample 2000 points 
+  python sample_points.py --in_dir ../proj_log/samples --out_dir pcd
+
+# evaluate performance 
+  python eval_cad.py --fake ../proj_log/samples \
+                     --real ../data/test_eval
+```
+Download [test_eval](https://drive.google.com/file/d/1R_Tzourk3XDIDUsnTn_UJVq3uVWe5s38/view?usp=sharing) and unzip it under the data folder. This contains the point clouds from DeepCAD test set. 
 
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
-@inproceedings{xxx,
+@inproceedings{ICML,
   title={SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
   author={xxx},
-  booktitle={xxx},
-  year={xxx}
+  year={2022}
 }
 ```
 
@@ -164,6 +180,9 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 Please see the [license](LICENSE) for further details.
 
 ---
+**Update (07/05/2022)**: Full code released.\
 **Update (06/06/2022)**: Evaluation code added.\
 **Update (06/05/2022)**: Training code added.\
 **Update (05/30/2022)**: Code will be released soon!
+
+

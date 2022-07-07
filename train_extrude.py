@@ -7,22 +7,23 @@ from dataset import ExtData
 import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.tensorboard import SummaryWriter
-from utils import get_constant_schedule_with_warmup
 from tqdm import tqdm
 
-
+import sys
+sys.path.insert(0, 'utils')
+from utils import get_constant_schedule_with_warmup
 
 def train(args):
-    # Initialize gpu device
+    # gpu device
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     device = torch.device("cuda:0")
     
     # Initialize dataset loader
-    dataset = ExtData(args.data, args.invalid, args.maxlen)
+    dataset = ExtData(args.data, args.maxlen)
     dataloader = torch.utils.data.DataLoader(dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
-                                             num_workers=8,
+                                             num_workers=5,
                                              pin_memory=True)
    
     # Initialize models
@@ -66,7 +67,7 @@ def train(args):
     iters = 0
     print('Start training...')
 
-    for epoch in range(500):
+    for epoch in range(200):  # 200 epochs is enough
         with tqdm(dataloader, unit="batch") as batch_data:
             for ext_seq, flag_seq, ext_mask in batch_data:
                 ext_seq = ext_seq.to(device)
@@ -91,7 +92,7 @@ def train(args):
                     writer.add_scalar("Loss/extrude", ext_loss, iters)
                     writer.add_scalar("Loss/vq", vq_loss, iters)
 
-                if iters % 50 == 0 and selection is not None:
+                if iters % 25 == 0 and selection is not None:
                     writer.add_histogram('selection', selection, iters)
 
                 # Update AE model
@@ -114,12 +115,11 @@ def train(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, required=True)
-    parser.add_argument("--output", type=str, help="Output folder to save the data [default: output]")
-    parser.add_argument("--batchsize", type=int, help="Training Batch Size")
-    parser.add_argument("--device", type=str, help="CUDA Device Index")
-    parser.add_argument("--bit", type=int, help="quantization bit")
-    parser.add_argument("--maxlen", type=int, help="maximum token length")
-    parser.add_argument("--invalid", type=str, required=True)
+    parser.add_argument("--output", type=str, required=True)
+    parser.add_argument("--batchsize", type=int, required=True)
+    parser.add_argument("--device", type=str, required=True)
+    parser.add_argument("--bit", type=int, required=True)
+    parser.add_argument("--maxlen", type=int, required=True)
     args = parser.parse_args()
 
     # Create training folder

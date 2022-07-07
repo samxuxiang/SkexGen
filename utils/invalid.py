@@ -2,42 +2,16 @@ import torch
 import os
 import numpy as np
 import pickle 
-from utils import CADparser, write_obj
+from utils import CADparser
 from multiprocessing import Pool
 import argparse
 from tqdm import tqdm
 
-SKETCH_R = 1
-RADIUS_R = 1
-EXTRUDE_R = 1.0
-SCALE_R =  1.4
-OFFSET_R = 0.9
-PIX_PAD = 4
-CMD_PAD = 3
-COORD_PAD = 4
-EXT_PAD = 1
 EXTRA_PAD = 1
-R_PAD = 2
-
 MAX_TOKEN = 5000
+NUM_TRHEADS = 36
 
-
-class Dataset():
-    """
-    Create pytorch dataloader for selective dataset
-    """
-    def __init__(self, datapath, bs, MAX_LEN, shuffle=True, workers=4):
-        self.data = SESketch(datapath, MAX_LEN)
-        self.dataloader = torch.utils.data.DataLoader(self.data, 
-                                                      shuffle=shuffle, 
-                                                      batch_size=bs,
-                                                      num_workers=workers,
-                                                      pin_memory=True)
-    def __len__(self):
-        return len(self.data)
-
-
-class SESketch(torch.utils.data.Dataset):
+class SE(torch.utils.data.Dataset):
     """ sketch-extrude dataset """
     def __init__(self, datapath, MAX_LEN):
         with open(datapath, 'rb') as f:
@@ -103,38 +77,23 @@ if __name__ == "__main__":
     parser.add_argument("--bit", type=int, required=True)
     args = parser.parse_args()
 
-    # # Parse some CAD for visualization 
-    # dataset = Dataset(datapath=os.path.join(args.datapath,'test.pkl'), bs=256, MAX_LEN=200, shuffle=False) 
-    # gen_data = []
-    # for k, batch in enumerate(dataset.dataloader): 
-    #     pixel_v_flat, pixel_v_mask, uids = batch
-    #     iter_data = zip(pixel_v_flat.detach().cpu().numpy(), uids)
-    #     load_iter = Pool(64).imap(raster, iter_data)
-    #     for valid, data_uid, parsed_data in load_iter:
-    #         if valid:
-    #             gen_data.append(parsed_data)
-    # # Save obj
-    # for idx, value in enumerate(gen_data):
-    #     output = os.path.join(args.datapath, 'test_obj', str(idx).zfill(3))
-    #     if not os.path.exists(output):
-    #         os.makedirs(output)
-    #     write_obj(output, value)
-   
-    dataset = Dataset(datapath=os.path.join(args.datapath,'train_unique_s.pkl'), bs=1024, MAX_LEN=MAX_TOKEN, shuffle=False) 
+    dataset = SE(datapath=os.path.join(args.datapath,'train.pkl'), MAX_LEN=MAX_TOKEN) 
+    dataloader = torch.utils.data.DataLoader(dataset, 
+                                             shuffle=False, 
+                                             batch_size=2048,
+                                             num_workers=5)
+    
     total_fails = 0
     invalid_uids = []
-
-    for k, batch in enumerate(tqdm(dataset.dataloader)): 
-        pixel_v_flat, pixel_v_mask, uids = batch
-        iter_data = zip(pixel_v_flat.detach().cpu().numpy(), uids)
-        load_iter = Pool(64).imap(raster, iter_data)
-        for valid, data_uid, _ in load_iter:
-            if not valid:
-                invalid_uids.append(data_uid)
+    with tqdm(dataloader, unit="batch") as batch_data:
+        for pixel_v_flat, pixel_v_mask, uids in batch_data:
+            iter_data = zip(pixel_v_flat.detach().cpu().numpy(), uids)
+            load_iter = Pool(NUM_TRHEADS).imap(raster, iter_data)  # number of threads in your pc
+            for valid, data_uid, _ in load_iter:
+                if not valid:
+                    invalid_uids.append(data_uid)
 
     # Invalid files 
-    with open(os.path.join(args.datapath,'train_invalid_s.pkl'), "wb") as tf:
+    with open(os.path.join(args.datapath,'train_invalid.pkl'), "wb") as tf:
         pickle.dump(invalid_uids, tf)
-
-
     print(f'Total failures: {100.0*len(invalid_uids)/len(dataset):2f}%')

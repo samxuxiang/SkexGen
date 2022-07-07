@@ -13,6 +13,7 @@ COORD_PAD = 4
 EXT_PAD = 1
 EXTRA_PAD = 1
 R_PAD = 2
+NUM_TRHEADS = 36
 
 def hash_loop_se(data):
     if len(data['se_ext']) == 0: 
@@ -82,11 +83,11 @@ def parallel_hash_loops(loops, hash_type):
     """ Parallel hash generated data """
     duplicate_groups = {}
     if hash_type =='se':
-        objs_iter = Pool(30).imap(hash_loop_se, loops)
+        objs_iter = Pool(NUM_TRHEADS).imap(hash_loop_se, loops)
     elif hash_type =='s':
-        objs_iter = Pool(30).imap(hash_loop_s, loops)
+        objs_iter = Pool(NUM_TRHEADS).imap(hash_loop_s, loops)
     elif hash_type =='e':
-        objs_iter = Pool(30).imap(hash_loop_e, loops)
+        objs_iter = Pool(NUM_TRHEADS).imap(hash_loop_e, loops)
     for h, uid in tqdm(objs_iter, total=len(loops)):
         if len(h)>0:
             if not h in duplicate_groups:
@@ -106,7 +107,6 @@ if __name__ == "__main__":
     print('loading data...')
     with open(os.path.join(args.data_folder, 'train.pkl'), 'rb') as f:
         loops = pickle.load(f)
-
     # Assign UID
     for idx, data in enumerate(loops):
         data['uid'] = idx
@@ -144,7 +144,7 @@ if __name__ == "__main__":
         else:
             pass
 
-    with open(os.path.join(args.data_folder,"train_unique_"+args.hash_type+".pkl"), "wb") as tf:
+    with open(os.path.join(args.datapath, "train_deduplicate_"+args.hash_type+".pkl"), "wb") as tf:
         pickle.dump(trainset, tf)
 
     print("Duplicate Stats:")

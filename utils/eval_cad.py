@@ -15,6 +15,7 @@ from chamfer_distance import ChamferDistance
 
 
 N_POINTS = 2000
+NUM_TRHEADS = 36
 
 
 def find_files(folder, extension):
@@ -219,21 +220,13 @@ def downsample_pc(points, n):
 
 
 def normalize_pc(points):
-    points = center_vertices(points) # center
-    scale = np.max(np.abs(points))  # scale
+    scale = np.max(np.abs(points))  
     points = points / scale
     return points
 
-def center_vertices(points):
-    """Translate the vertices so that bounding box is centered at zero."""
-    vert_min = points.min(axis=0)
-    vert_max = points.max(axis=0)
-    vert_center = 0.5 * (vert_min + vert_max)
-    return points - vert_center
-
 
 def collect_pc(cad_folder):
-    pc_path = find_files(os.path.join(cad_folder, 'pcd'), 'final_8096pcd.ply')
+    pc_path = find_files(os.path.join(cad_folder, 'pcd'), 'final_pcd.ply')
     if len(pc_path) == 0:
         return []
     pc_path = pc_path[-1] # final pcd
@@ -256,40 +249,37 @@ def main():
     parser.add_argument("--fake", type=str)
     parser.add_argument("--real", type=str)
     parser.add_argument("--output", type=str)
-    parser.add_argument("--n_test", type=int, default=1000) 
-    parser.add_argument("--multi", type=int, default=3)    
+    parser.add_argument("--n_test", type=int, default=3000) 
+    parser.add_argument("--multi", type=int, default=4)    
     parser.add_argument("--times", type=int, default=3)
     parser.add_argument("--batch_size", type=int, default=64)
     args = parser.parse_args()
 
     print("n_test: {}, multiplier: {}, repeat times: {}".format(args.n_test, args.multi, args.times))
-
     if args.output is None:
         args.output = args.fake + '_cad_results.txt'
 
     # Load reference pcd 
     ref_pcs = []
     project_folders = sorted(glob(args.real+'/*/'))   
-    
-    load_iter = Pool(36).imap(collect_pc, project_folders)
+    load_iter = Pool(NUM_TRHEADS).imap(collect_pc, project_folders)  
     for pc in tqdm(load_iter, total=len(project_folders)):
         if len(pc) > 0:
             ref_pcs.append(pc)
-    
     ref_pcs = np.stack(ref_pcs, axis=0)
     print("real point clouds: {}".format(ref_pcs.shape))
 
     # Load fake pcd 
     sample_pcs = []
     project_folders = sorted(glob(args.fake+'/*/'))
-    
-    load_iter = Pool(36).imap(collect_pc, project_folders)
+    load_iter = Pool(NUM_TRHEADS).imap(collect_pc, project_folders)
     for pc in tqdm(load_iter, total=len(project_folders)):
         if len(pc) > 0:
             sample_pcs.append(pc)
     sample_pcs = np.stack(sample_pcs, axis=0)
     print("fake point clouds: {}".format(sample_pcs.shape))
     
+    # Testing
     fp = open(args.output, "w")
     result_list = []
     for i in range(args.times):

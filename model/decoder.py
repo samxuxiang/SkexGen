@@ -12,9 +12,7 @@ EXT_PAD = 1
 EXTRA_PAD = 1
 R_PAD = 2
 NUM_FLAG = 9 
-
-SAMPLE_PROB = 0.95
-DROP_RATE = 0.2
+SAMPLE_PROB = 0.5 # or 0.95
 
 
 def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
@@ -108,7 +106,7 @@ class SketchDecoder(nn.Module):
     self.decoder = TransformerDecoder(decoder_layers, config['num_layers'], decoder_norm)
 
 
-  def forward(self, pixel_v, xy_v, pixel_mask, latent_z, is_training=True):
+  def forward(self, pixel_v, xy_v, pixel_mask, latent_z):
     """ forward pass """
     if pixel_v[0] is None:
       c_bs = len(pixel_v)
@@ -124,12 +122,6 @@ class SketchDecoder(nn.Module):
       coord_embed = self.coord_embed_x(xy_v[...,0]) + self.coord_embed_y(xy_v[...,1]) # [bs, vlen, dim]
       pixel_embed = self.pixel_embed(pixel_v)
       embed_inputs = pixel_embed + coord_embed
-      
-      if is_training:
-        # dropout (optional)
-        drop_index = np.random.uniform(low=0.0, high=1.0, size=(embed_inputs.shape[0], embed_inputs.shape[1])) < DROP_RATE
-        embed_inputs[drop_index, :] = 0.0
-
       embeddings = torch.cat([context_embedding, embed_inputs.transpose(0,1)], axis=0)
       decoder_inputs = self.pos_embed(embeddings) 
 
@@ -159,9 +151,6 @@ class SketchDecoder(nn.Module):
     top_k = 0
     top_p = SAMPLE_PROB
 
-    left_list = np.array(list(range(n_samples)))
-    done_list = []
-
     # Mapping from pixel index to xy coordiante
     pixel2xy = {}
     x=np.linspace(0, 2**self.bits-1, 2**self.bits)
@@ -179,7 +168,7 @@ class SketchDecoder(nn.Module):
       
       # pass through model
       with torch.no_grad():
-        p_pred = self.forward(pixel_seq, xy_seq, None, latent_z, is_training=False)
+        p_pred = self.forward(pixel_seq, xy_seq, None, latent_z)
         p_logits = p_pred[:, -1, :]
 
       next_pixels = []
@@ -217,7 +206,6 @@ class SketchDecoder(nn.Module):
         done_pixs = pixel_seq[done_idx] 
         done_xys = xy_seq[done_idx]
         done_ext = latent_ext[done_idx]
-        done_list.append(left_list[done_idx])
        
         for pix, xy, ext in zip(done_pixs, done_xys, done_ext):
           pix = pix.detach().cpu().numpy()
@@ -232,12 +220,11 @@ class SketchDecoder(nn.Module):
       else:
         pixel_seq = pixel_seq[left_idx]
         xy_seq = xy_seq[left_idx]
-        left_list = left_list[left_idx]
         if latent_z is not None:
           latent_z = latent_z[left_idx]
           latent_ext = latent_ext[left_idx]
     
-    return pix_samples, latent_ext_samples, np.hstack(done_list)
+    return pix_samples, latent_ext_samples
 
 
 class EXTDecoder(nn.Module):
@@ -269,7 +256,7 @@ class EXTDecoder(nn.Module):
     self.decoder = TransformerDecoder(decoder_layers, config['num_layers'], decoder_norm)
       
 
-  def forward(self, ext_v, flags, ext_mask, code=None, is_training=True):
+  def forward(self, ext_v, flags, ext_mask, code=None):
     """ forward pass """
     if ext_v[0] is None:
       c_bs = len(ext_v)
@@ -312,9 +299,6 @@ class EXTDecoder(nn.Module):
     top_k = 0
     top_p = SAMPLE_PROB
 
-    left_list = np.array(list(range(n_samples)))
-    done_list = []
-
     # Sample per token
     for k in range(self.max_len):
       if k == 0:
@@ -323,7 +307,7 @@ class EXTDecoder(nn.Module):
 
       # pass through model
       with torch.no_grad():
-        p_pred = self.forward(pixel_seq, flag_seq, None, latent_z, is_training=False)
+        p_pred = self.forward(pixel_seq, flag_seq, None, latent_z)
         p_logits = p_pred[:, -1, :]
 
       next_pixels = []
@@ -359,7 +343,6 @@ class EXTDecoder(nn.Module):
       if len(done_idx) > 0:
         done_exts = pixel_seq[done_idx] 
         done_pixs = [sample_pixels[x] for x in done_idx]
-        done_list.append(left_list[done_idx])
         
         for pix_job, ext_job in zip(done_pixs, done_exts):
           ext_job = ext_job.detach().cpu().numpy()
@@ -376,16 +359,14 @@ class EXTDecoder(nn.Module):
           merged = np.hstack(merged)
           samples.append(merged)
       
-      
       left_idx = np.where(next_pixels!=0)[0]
       if len(left_idx) == 0:
         break # no more jobs to do
       else:
         pixel_seq = pixel_seq[left_idx]
         flag_seq = flag_seq[left_idx]
-        left_list = left_list[left_idx]
         if latent_z is not None:
           latent_z = latent_z[left_idx]
           sample_pixels = [sample_pixels[x] for x in left_idx]
 
-    return samples, np.hstack(done_list)
+    return samples

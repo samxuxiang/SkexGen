@@ -10,7 +10,6 @@ from geometry.obj_parser import OBJParser
 from utils import write_stl_file
 from OCC.Extend.DataExchange import write_step_file 
 
-
 import signal
 from contextlib import contextmanager
 @contextmanager
@@ -29,7 +28,8 @@ def timeout(time):
         signal.signal(signal.SIGALRM, signal.SIG_IGN)
 def raise_timeout(signum, frame):
     raise TimeoutError
-
+    
+NUM_TRHEADS = 36 
 
 def find_files(folder, extension):
     return sorted([Path(os.path.join(folder, f)) for f in os.listdir(folder) if f.endswith(extension)])
@@ -97,6 +97,6 @@ if __name__ == "__main__":
     solids = []
     cad_folders = sorted(glob(args.data_folder+'/*/'))
 
-    convert_iter = Pool(36).imap(run_parallel, cad_folders)
+    convert_iter = Pool(NUM_TRHEADS).imap(run_parallel, cad_folders) 
     for solid in tqdm(convert_iter, total=len(cad_folders)):
         pass
