@@ -28,7 +28,7 @@ Note: only tested on CUDA 11.4.
  
 ## Data
 
-Download the [raw json data](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG) from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD). Unzip it under the data folder.
+Download the [raw json data](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG)  from [DeepCAD](https://github.com/ChrisWu1997/DeepCAD). Unzip it into the `data` folder in the root of this repository.   Also download the and [train_val_test_split.json](https://drive.google.com/drive/folders/1mSJBZjKC-Z5I7pLPTgb4b5ZP-Y6itvGG) and place this in the `data` folder as well.
 
 Follow these steps to convert DeepCAD data to SkexGen format:
 ```bash
