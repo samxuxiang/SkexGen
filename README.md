@@ -3,7 +3,7 @@
 Xiang Xu, Karl D.D. Willis, Joseph G. Lambourne, Chin-Yi Cheng, Pradeep Kumar Jayaraman, Yasutaka Furukawa
 
 **ICML 2022**  
-[webpage](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [youtube](https://www.youtube.com/watch?v=j5LB7yMwNVE) 
+[project](https://samxuxiang.github.io/skexgen/index.html) | [paper]() | [youtube](https://www.youtube.com/watch?v=j5LB7yMwNVE) 
 
 
 ## Installation
