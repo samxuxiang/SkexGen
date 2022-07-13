@@ -66,6 +66,7 @@ Train sketch branch (topology encoder, geometry encoder, sketch decoder):
     python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
                            --output proj_log/exp_sketch \
                            --invalid data/cad_data/train_invalid.pkl \
+                           --val_data data/cad_data/val.pkl \
                            --bit 6 --maxlen 200 --batchsize 128 --device 0
   ```
   `maxlen`: sketch sequence length (default 200)
@@ -160,14 +161,3 @@ Please see the [license](LICENSE) for further details.
 **Update (06/06/2022)**: Evaluation code added.\
 **Update (06/05/2022)**: Training code added.\
 **Update (05/30/2022)**: Code will be released soon!
-
-
-
-
-
-
-python train_sketch.py --data /data/xuxiangx/project/SkexGen-main/data/cad_data/train_deduplicate_s.pkl \
-                           --output ../proj_log/exp_sketch \
-                           --invalid /data/xuxiangx/project/SkexGen-main/data/cad_data/train_invalid.pkl \
-                           --val_data /data/xuxiangx/project/SkexGen-main/data/cad_data/val.pkl \
-                           --bit 6 --maxlen 200 --batchsize 128 --device 0
