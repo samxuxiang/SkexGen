@@ -8,10 +8,12 @@ from torch.utils.tensorboard import SummaryWriter
 from model.encoder import PARAMEncoder, CMDEncoder
 from model.decoder import SketchDecoder
 from tqdm import tqdm
-
+import numpy as np 
 import sys
 sys.path.insert(0, 'utils')
 from utils import get_constant_schedule_with_warmup
+
+import pdb
 
 def train(args):
     # gpu device
@@ -25,6 +27,13 @@ def train(args):
                                              batch_size=args.batchsize,
                                              num_workers=5,
                                              pin_memory=True)
+
+    val_dataset = SketchData(args.val_data, args.invalid, args.maxlen)
+    val_dataloader = torch.utils.data.DataLoader(val_dataset, 
+                                                 shuffle=False, 
+                                                 batch_size=args.batchsize,
+                                                 num_workers=5)
+    
     # Initialize models
     cmd_encoder = CMDEncoder(
         config={
@@ -80,9 +89,8 @@ def train(args):
     # Main training loop
     iters = 0
     print('Start training...')
-
+    
     for epoch in range(300):  # 300 epochs is usually enough
-        print(f'Epoch {epoch}')
         with tqdm(dataloader, unit="batch") as batch_data:
             for cmd, cmd_mask, pix, xy, mask, pix_aug, xy_aug, mask_aug in batch_data:
                 cmd = cmd.to(device)
@@ -136,12 +144,44 @@ def train(args):
             torch.save(param_encoder.state_dict(), os.path.join(args.output,'paramenc_epoch_'+str(epoch+1)+'.pt'))
             torch.save(cmd_encoder.state_dict(), os.path.join(args.output,'cmdenc_epoch_'+str(epoch+1)+'.pt'))
 
+        # Validation loss 
+        print('Testing...')
+        if (epoch+1) % 30 == 0:
+            pix_losses = []
+            with tqdm(val_dataloader, unit="batch") as batch_data:
+                for cmd, cmd_mask, pix, xy, mask, pix_aug, xy_aug, mask_aug in batch_data:
+                    with torch.no_grad():
+                        cmd = cmd.to(device)
+                        cmd_mask = cmd_mask.to(device)
+                        pix = pix.to(device) 
+                        xy = xy.to(device)
+                        mask = mask.to(device)
+                        pix_aug = pix_aug.to(device) 
+                        xy_aug = xy_aug.to(device)
+                        mask_aug = mask_aug.to(device)
+
+                        # Pass through encoders
+                        latent_cmd, _, _ = cmd_encoder(cmd, cmd_mask, epoch)
+                        latent_param, _, _ = param_encoder(pix_aug, xy_aug, mask_aug, epoch) 
+                        latent_z = torch.cat((latent_cmd, latent_param), 1)
+                    
+                        # Pass through decoder
+                        pix_pred = sketch_decoder(pix[:, :-1], xy[:, :-1, :], mask[:, :-1], latent_z)
+                        pix_mask = ~mask.reshape(-1)
+                        pix_logit = pix_pred.reshape(-1, pix_pred.shape[-1]) 
+                        pix_target = pix.reshape(-1)
+                        pix_loss = F.cross_entropy(pix_logit[pix_mask], pix_target[pix_mask])
+                        pix_losses.append(pix_loss.item())
+            avg_pix = np.array(pix_losses).mean()
+            print(f'Epoch {epoch}: avg pixel loss is {avg_pix}')
+
     writer.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=str, required=True)
+    parser.add_argument("--val_data", type=str, required=True)
     parser.add_argument("--invalid", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--batchsize", type=int, required=True)

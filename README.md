@@ -141,12 +141,16 @@ Download [test_eval](https://drive.google.com/file/d/1R_Tzourk3XDIDUsnTn_UJVq3uV
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
-@inproceedings{ICML,
+@inproceedings{xu2022skexgen,
   title={SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
-  author={xxx},
-  year={2022}
+  author={Xu, Xiang and Willis, Karl DD and Lambourne, Joseph G and Cheng, Chin-Yi and Jayaraman, Pradeep Kumar and Furukawa, Yasutaka},
+  booktitle={International Conference on Machine Learning},
+  year={2022},
 }
 ```
+
+
+
 
 ## License
 Please see the [license](LICENSE) for further details.
@@ -158,3 +162,12 @@ Please see the [license](LICENSE) for further details.
 **Update (05/30/2022)**: Code will be released soon!
 
 
+
+
+
+
+python train_sketch.py --data /data/xuxiangx/project/SkexGen-main/data/cad_data/train_deduplicate_s.pkl \
+                           --output ../proj_log/exp_sketch \
+                           --invalid /data/xuxiangx/project/SkexGen-main/data/cad_data/train_invalid.pkl \
+                           --val_data /data/xuxiangx/project/SkexGen-main/data/cad_data/val.pkl \
+                           --bit 6 --maxlen 200 --batchsize 128 --device 0
