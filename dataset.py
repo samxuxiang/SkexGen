@@ -61,8 +61,8 @@ class SketchData(torch.utils.data.Dataset):
                     self.maxlen_se = num_se
 
         self.uids = sorted(list(set(self.data.keys()).intersection(set(self.data.keys()))))
-        print(f'Sketch Post-Filter: {len(self.uids)}, Keep Ratio: {100*len(self.uids)/len(data):.2f}%')
-        print(f'Max Pix {self.maxlen_pix}, Max CMD {self.maxlen_cmd}, Max SE {self.maxlen_se}')
+        # print(f'Sketch Post-Filter: {len(self.uids)}, Keep Ratio: {100*len(self.uids)/len(data):.2f}%')
+        # print(f'Max Pix {self.maxlen_pix}, Max CMD {self.maxlen_cmd}, Max SE {self.maxlen_se}')
 
 
     def __len__(self):
@@ -193,8 +193,8 @@ class SketchExtData(torch.utils.data.Dataset):
                     self.maxlen_ext = ext_len+EXTRA_PAD
         
         self.uids = sorted(list(set(self.data.keys())))
-        print(f'Sketch Post-Filter: {len(self.uids)}, Keep Ratio: {100*len(self.uids)/len(data):.2f}%')
-        print(f'Max Pix {self.maxlen_pix}, Max CMD {self.maxlen_cmd}')
+        # print(f'Sketch Post-Filter: {len(self.uids)}, Keep Ratio: {100*len(self.uids)/len(data):.2f}%')
+        # print(f'Max Pix {self.maxlen_pix}, Max CMD {self.maxlen_cmd}')
      
 
     def __len__(self):
@@ -277,8 +277,8 @@ class ExtData(torch.utils.data.Dataset):
                 if ext_len+EXTRA_PAD > self.maxlen_ext:
                     self.maxlen_ext = ext_len+EXTRA_PAD
 
-        print(f'Sketch Post-Filter: {len(self.data)}, Keep Ratio: {100*len(self.data)/len(data):.2f}%')
-        print(f'Max Ext {self.maxlen_ext}')
+        # print(f'Sketch Post-Filter: {len(self.data)}, Keep Ratio: {100*len(self.data)/len(data):.2f}%')
+        # print(f'Max Ext {self.maxlen_ext}')
 
      
     def __len__(self):

@@ -13,7 +13,6 @@ import sys
 sys.path.insert(0, 'utils')
 from utils import get_constant_schedule_with_warmup
 
-import pdb
 
 def train(args):
     # gpu device
@@ -21,8 +20,8 @@ def train(args):
     device = torch.device("cuda:0")
     
     # Initialize dataset loader
-    dataset = SketchData(args.data, args.invalid, args.maxlen)
-    dataloader = torch.utils.data.DataLoader(dataset, 
+    train_dataset = SketchData(args.train_data, args.invalid, args.maxlen)
+    train_dataloader = torch.utils.data.DataLoader(train_dataset, 
                                              shuffle=True, 
                                              batch_size=args.batchsize,
                                              num_workers=5,
@@ -43,7 +42,7 @@ def train(args):
             'num_heads': 8,
             'dropout_rate': 0.1
         },
-        max_len=dataset.maxlen_pix,
+        max_len=train_dataset.maxlen_pix,
         code_len = 4,
         num_code = 500,
     )
@@ -58,7 +57,7 @@ def train(args):
             'dropout_rate': 0.1
         },
         quantization_bits=args.bit,
-        max_len=dataset.maxlen_pix,
+        max_len=train_dataset.maxlen_pix,
         code_len = 2,
         num_code = 1000,
     )
@@ -72,8 +71,8 @@ def train(args):
             'num_heads': 8,
             'dropout_rate': 0.1  
         },
-        pix_len=dataset.maxlen_pix,
-        cmd_len=dataset.maxlen_cmd,
+        pix_len=train_dataset.maxlen_pix,
+        cmd_len=train_dataset.maxlen_cmd,
         quantization_bits=args.bit,
     )
     sketch_decoder = sketch_decoder.to(device).train()
@@ -91,7 +90,7 @@ def train(args):
     print('Start training...')
     
     for epoch in range(300):  # 300 epochs is usually enough
-        with tqdm(dataloader, unit="batch") as batch_data:
+        with tqdm(train_dataloader, unit="batch") as batch_data:
             for cmd, cmd_mask, pix, xy, mask, pix_aug, xy_aug, mask_aug in batch_data:
                 cmd = cmd.to(device)
                 cmd_mask = cmd_mask.to(device)
@@ -180,7 +179,7 @@ def train(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=str, required=True)
+    parser.add_argument("--train_data", type=str, required=True)
     parser.add_argument("--val_data", type=str, required=True)
     parser.add_argument("--invalid", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)

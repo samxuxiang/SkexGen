@@ -63,7 +63,7 @@ You can download the already [pre-processed data](https://drive.google.com/file/
 
 Train sketch branch (topology encoder, geometry encoder, sketch decoder):
   ```
-    python train_sketch.py --data data/cad_data/train_deduplicate_s.pkl \
+    python train_sketch.py --train_data data/cad_data/train_deduplicate_s.pkl \
                            --output proj_log/exp_sketch \
                            --invalid data/cad_data/train_invalid.pkl \
                            --val_data data/cad_data/val.pkl \
@@ -73,7 +73,8 @@ Train sketch branch (topology encoder, geometry encoder, sketch decoder):
 
 Train extrude branch (extrude encoder, extrude decoder):
   ```
-    python train_extrude.py --data data/cad_data/train_deduplicate_e.pkl \
+    python train_extrude.py --train_data data/cad_data/train_deduplicate_e.pkl \
+                            --val_data data/cad_data/val.pkl \
                             --output proj_log/exp_extrude \
                             --bit 6 --maxlen 5 --batchsize 128 --device 0
   ```
@@ -151,13 +152,5 @@ If you find our work useful in your research, please cite our paper [SkexGen](ht
 ```
 
 
-
-
 ## License
 Please see the [license](LICENSE) for further details.
-
----
-**Update (07/05/2022)**: Full code released.\
-**Update (06/06/2022)**: Evaluation code added.\
-**Update (06/05/2022)**: Training code added.\
-**Update (05/30/2022)**: Code will be released soon!
