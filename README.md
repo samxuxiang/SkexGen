@@ -143,11 +143,13 @@ Download [test_eval](https://drive.google.com/file/d/1R_Tzourk3XDIDUsnTn_UJVq3uV
 ## Citation
 If you find our work useful in your research, please cite our paper [SkexGen](https://samxuxiang.github.io/skexgen):
 ```
-@inproceedings{xu2022skexgen,
-  title={SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
-  author={Xu, Xiang and Willis, Karl DD and Lambourne, Joseph G and Cheng, Chin-Yi and Jayaraman, Pradeep Kumar and Furukawa, Yasutaka},
-  booktitle={International Conference on Machine Learning},
-  year={2022},
+@inproceedings{xu2022skexgen, 
+title     = {SkexGen: Autoregressive Generation of CAD Construction Sequences with Disentangled Codebooks},
+author    = {Xu, Xiang and Willis, Karl DD and Lambourne, Joseph G and Cheng, Chin-Yi and Jayaraman, Pradeep Kumar and Furukawa, Yasutaka},
+booktitle = {International Conference on Machine Learning},
+pages={24698--24724},
+year={2022},
+organization={PMLR}
 }
 ```
 
